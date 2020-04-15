@@ -20,12 +20,8 @@ public class PaymentInstrumentConnectorServiceImpl
     }
 
     @Override
-    public Boolean checkActive(String hpan, OffsetDateTime accountingDate) throws Exception {
-        try {
-            return paymentInstrumentRestClient.checkActive(hpan, accountingDate);
-        } catch (Exception e) {
-            throw new Exception();
-        }
+    public Boolean checkActive(String hpan, OffsetDateTime accountingDate) {
+        return paymentInstrumentRestClient.checkActive(hpan, accountingDate);
     }
 
 }

@@ -2,8 +2,8 @@ package it.gov.pagopa.rtd.transaction_manager.service;
 
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 
-public interface PointTransactionProducerService {
+public interface InvoiceTransactionPublisherService {
 
-    void savePointTransaction(Transaction transaction);
+    void publishInvoiceTransactionEvent(Transaction transaction);
 
 }

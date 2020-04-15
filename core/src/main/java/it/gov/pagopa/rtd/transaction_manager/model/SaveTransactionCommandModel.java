@@ -1,5 +1,4 @@
-package it.gov.pagopa.rtd.transaction_manager.command.model;
-import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
+package it.gov.pagopa.rtd.transaction_manager.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

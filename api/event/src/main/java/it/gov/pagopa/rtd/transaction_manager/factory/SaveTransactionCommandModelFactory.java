@@ -1,7 +1,7 @@
 package it.gov.pagopa.rtd.transaction_manager.factory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.gov.pagopa.rtd.transaction_manager.command.model.SaveTransactionCommandModel;
+import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,8 +17,6 @@ import java.util.Set;
 @Component
 public class SaveTransactionCommandModelFactory implements
         ModelFactory<Pair<byte[], Headers>, SaveTransactionCommandModel>  {
-
-
 
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();

@@ -49,9 +49,6 @@ public class Transaction {
     @Size(max = 5)
     String mcc;
 
-    @Size(max = 40)
-    String mccDescription;
-
     Long awardPeriodId;
 
     Integer acquirerId;

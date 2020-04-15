@@ -2,7 +2,7 @@ package it.gov.pagopa.rtd.transaction_manager.listener;
 
 import eu.sia.meda.eventlistener.BaseEventListener;
 import it.gov.pagopa.rtd.transaction_manager.command.SaveTransactionCommand;
-import it.gov.pagopa.rtd.transaction_manager.command.model.SaveTransactionCommandModel;
+import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.factory.ModelFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,7 +38,7 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
                     saveTransactionCommandModel);
             command.execute();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             String payloadString = "null";
             if(payload != null){
                 try{
@@ -55,7 +55,5 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
             }
         }
     }
-
-
 
 }

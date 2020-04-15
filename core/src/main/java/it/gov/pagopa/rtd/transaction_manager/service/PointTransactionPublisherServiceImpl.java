@@ -1,7 +1,8 @@
-package it.gov.pagopa.rtd.transaction_manager;
+package it.gov.pagopa.rtd.transaction_manager.service;
 
 import eu.sia.meda.event.transformer.SimpleEventRequestTransformer;
 import eu.sia.meda.event.transformer.SimpleEventResponseTransformer;
+import it.gov.pagopa.rtd.transaction_manager.PointTransactionPublisherConnector;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
