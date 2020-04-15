@@ -1,17 +1,28 @@
 package it.gov.pagopa.rtd.transaction_manager.service;
 
+import eu.sia.meda.BaseTest;
+import it.gov.pagopa.rtd.transaction_manager.connector.PaymentInstrumentRestClient;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
-import static org.junit.Assert.*;
+public class PaymentInstrumentConnectorServiceTest extends BaseTest {
 
-public class PaymentInstrumentConnectorServiceTest {
+    @Mock
+    PaymentInstrumentRestClient paymentInstrumentRestClient;
 
     @Before
     public void setUp() throws Exception {
+        Mockito.reset(paymentInstrumentRestClient);
     }
 
     @Test
-    public void checkActive() {
+    public void checkActiveTrue() {
+
+    }
+
+    @Test
+    public void checkActiveFalse() {
     }
 }

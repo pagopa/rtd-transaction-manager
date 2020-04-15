@@ -25,7 +25,7 @@ class PointTransactionPublisherServiceImpl implements PointTransactionPublisherS
 
     @Override
     public void publishPointTransactionEvent(Transaction transaction) {
-        pointTransactionPublisherConnector.call(
+        pointTransactionPublisherConnector.doCall(
                 transaction, simpleEventRequestTransformer, simpleEventResponseTransformer);
     }
 }
