@@ -15,7 +15,7 @@ public class InvoiceTransactionPublisherConnector
             Transaction> requestTransformer,
             IEventResponseTransformer<Void, Boolean> responseTransformer,
             Object... args) {
-       return this.call(transaction, requestTransformer, responseTransformer, args);
+        return this.call(transaction, requestTransformer, responseTransformer, args);
     }
     
 }

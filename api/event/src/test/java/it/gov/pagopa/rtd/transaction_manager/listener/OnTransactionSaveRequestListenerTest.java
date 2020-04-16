@@ -3,7 +3,7 @@ package it.gov.pagopa.rtd.transaction_manager.listener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.sia.meda.event.service.ErrorPublisherService;
 import eu.sia.meda.eventlistener.BaseEventListenerTest;
-import it.gov.pagopa.rtd.transaction_manager.command.SaveTransactionCommand;
+import it.gov.pagopa.rtd.transaction_manager.command.BaseSaveTransactionCommandImpl;
 import it.gov.pagopa.rtd.transaction_manager.factory.SaveTransactionCommandModelFactory;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import org.junit.Assert;
@@ -45,7 +45,7 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
     BeanFactory beanFactoryMock;
 
     @MockBean
-    SaveTransactionCommand saveTransactionCommandMock;
+    BaseSaveTransactionCommandImpl saveTransactionCommandMock;
 
 
     @Before

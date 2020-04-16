@@ -1,11 +1,22 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import eu.sia.meda.BaseSpringTest;
+import eu.sia.meda.async.util.AsyncUtils;
+import eu.sia.meda.core.model.ApplicationContext;
+import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
+import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
+import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
+import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.math.BigDecimal;
@@ -14,16 +25,91 @@ import java.time.OffsetDateTime;
 @ContextConfiguration(classes = SaveTransactionCommandImpl.class)
 public class SaveTransactionCommandTest extends BaseSpringTest {
 
+    @MockBean
+    PaymentInstrumentConnectorService paymentInstrumentConnectorServiceMock;
+    @MockBean
+    PointTransactionPublisherService pointTransactionProducerServiceMock;
+    @MockBean
+    InvoiceTransactionPublisherService invoiceTransactionProducerServiceMock;
+    @SpyBean
+    ApplicationContext applicationContext;
+    @SpyBean
+    AsyncUtils asyncUtils;
     @Autowired
     BeanFactory beanFactory;
 
     @Before
     public void initTest() {
+
+        Mockito.reset(
+                paymentInstrumentConnectorServiceMock,
+                pointTransactionProducerServiceMock,
+                invoiceTransactionProducerServiceMock,
+                asyncUtils);
+
     }
 
     @Test
-    public void testOk() {
+    public void test_BDPActive() {
 
+        Transaction transaction = getRequestObject();
+        SaveTransactionCommand saveTransactionCommand = buildCommandInstance();
+
+        try {
+
+            BDDMockito.doReturn(true).when(paymentInstrumentConnectorServiceMock)
+                    .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+            BDDMockito.doNothing().when(pointTransactionProducerServiceMock)
+                    .publishPointTransactionEvent(Mockito.eq(transaction));
+
+            Boolean isOk = saveTransactionCommand.execute();
+
+            Assert.assertTrue(isOk);
+            BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
+                    .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+            BDDMockito.verify(pointTransactionProducerServiceMock, Mockito.atLeastOnce())
+                    .publishPointTransactionEvent(Mockito.eq(transaction));
+            BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
+    }
+
+    @Test
+    public void test_BDPNotActive() {
+
+        Transaction transaction = getRequestObject();
+        SaveTransactionCommand saveTransactionCommand = buildCommandInstance();
+
+        try {
+
+            BDDMockito.doReturn(false).when(paymentInstrumentConnectorServiceMock)
+                    .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+            BDDMockito.doNothing().when(pointTransactionProducerServiceMock)
+                    .publishPointTransactionEvent(Mockito.eq(transaction));
+
+            Boolean isOk = saveTransactionCommand.execute();
+
+            Assert.assertTrue(isOk);
+            BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
+                    .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+            BDDMockito.verifyZeroInteractions(pointTransactionProducerServiceMock);
+            BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
+    }
+
+    protected SaveTransactionCommand buildCommandInstance() {
+        return beanFactory.getBean(
+                SaveTransactionCommand.class,
+                SaveTransactionCommandModel.builder().payload(getRequestObject()).headers(null).build());
     }
 
     protected Transaction getRequestObject() {

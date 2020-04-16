@@ -2,8 +2,8 @@ package it.gov.pagopa.rtd.transaction_manager.listener;
 
 import eu.sia.meda.eventlistener.BaseEventListener;
 import it.gov.pagopa.rtd.transaction_manager.command.SaveTransactionCommand;
-import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.factory.ModelFactory;
+import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.common.header.Headers;
@@ -34,8 +34,8 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
 
             SaveTransactionCommandModel saveTransactionCommandModel =
                     saveTransactionCommandModelFactory.createModel(Pair.of(payload, headers));
-            SaveTransactionCommand command = beanFactory.getBean(SaveTransactionCommand.class,
-                    saveTransactionCommandModel);
+            SaveTransactionCommand command = beanFactory.getBean(
+                    SaveTransactionCommand.class, saveTransactionCommandModel);
             command.execute();
 
         } catch (Exception e) {
