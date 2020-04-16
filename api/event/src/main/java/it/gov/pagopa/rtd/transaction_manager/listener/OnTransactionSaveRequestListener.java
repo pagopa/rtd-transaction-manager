@@ -4,14 +4,13 @@ import eu.sia.meda.eventlistener.BaseEventListener;
 import it.gov.pagopa.rtd.transaction_manager.command.SaveTransactionCommand;
 import it.gov.pagopa.rtd.transaction_manager.factory.ModelFactory;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
 
 @Service
 @Slf4j
@@ -28,6 +27,7 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
         this.beanFactory = beanFactory;
     }
 
+    @SneakyThrows
     @Override
     public void onReceived(byte[] payload, Headers headers) {
         try {
@@ -36,23 +36,16 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
                     saveTransactionCommandModelFactory.createModel(Pair.of(payload, headers));
             SaveTransactionCommand command = beanFactory.getBean(
                     SaveTransactionCommand.class, saveTransactionCommandModel);
-            command.execute();
+            if (!command.execute()) {
+                throw new Exception("Failed to execute SaveTransactionCommand");
+            }
 
         } catch (Exception e) {
-            String payloadString = "null";
-            if(payload != null){
-                try{
-                    payloadString = new String(payload, StandardCharsets.UTF_8);
-                } catch (Exception e2){
-                    if (log.isErrorEnabled()) {
-                        log.error("Something gone wrong converting the payload into String", e2);
-                    }
-                }
-            }
+            //TODO: Gestione casi d'errori per acknowledgment
             if (log.isErrorEnabled()) {
-                log.error(String.format(
-                        "Something gone wrong during the evaluation of the payload:%n%s", payloadString), e);
+                log.error(e.getMessage(),e);
             }
+            throw e;
         }
     }
 

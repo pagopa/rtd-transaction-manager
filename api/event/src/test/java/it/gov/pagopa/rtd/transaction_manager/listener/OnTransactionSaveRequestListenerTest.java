@@ -55,7 +55,7 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
                 onTransactionSaveRequestListenerSpy,
                 saveTransactionCommandModelFactorySpy,
                 beanFactoryMock, saveTransactionCommandMock);
-        Mockito.doReturn(getRequestObject()).when(saveTransactionCommandMock).execute();
+        Mockito.doReturn(true).when(saveTransactionCommandMock).execute();
 
     }
 

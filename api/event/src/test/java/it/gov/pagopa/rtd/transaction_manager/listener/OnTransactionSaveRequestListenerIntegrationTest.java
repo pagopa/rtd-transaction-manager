@@ -11,7 +11,6 @@ import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorS
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
-import org.junit.Before;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,6 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-
-import static org.mockito.Mockito.doAnswer;
 
 @ContextConfiguration(classes = {
         TestConfig.class,
@@ -103,16 +100,6 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
                 .build();
     }
 
-    @Before
-    public void initTesting() {
-        latch = new CountDownLatch(1);
-        doAnswer(invocation -> {
-            Object result = invocation.callRealMethod();
-            latch.countDown();
-            return result;
-        }).when(pointTransactionPublisherServiceSpy).publishPointTransactionEvent(Mockito.any());
-    }
-
     @Override
     protected String getTopicSubscription() {
         return topicSubscription;
@@ -128,17 +115,12 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
 
         try {
             Transaction sentTransaction = getRequestObject();
+            Assert.assertEquals(1,records.size());
             BDDMockito.verify(paymentInstrumentConnectorServiceSpy, Mockito.atLeastOnce())
                     .checkActive(Mockito.eq(sentTransaction.getHpan()),
                             Mockito.eq(sentTransaction.getTrxDate()));
+            BDDMockito.verify(pointTransactionPublisherServiceSpy).publishPointTransactionEvent(Mockito.any());
             BDDMockito.verifyZeroInteractions(invoiceTransactionPublisherServiceSpy);
-
-            try {
-                latch.await();
-                BDDMockito.verify(pointTransactionPublisherServiceSpy).publishPointTransactionEvent(Mockito.any());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
 
         } catch (Exception e) {
             e.printStackTrace();

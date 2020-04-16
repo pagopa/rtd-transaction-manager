@@ -6,12 +6,11 @@ import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
-
-import java.util.function.Supplier;
 
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Slf4j
@@ -55,6 +54,7 @@ public abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
     }
 
+    @SneakyThrows
     @Override
     public Boolean doExecute() {
 
@@ -64,20 +64,17 @@ public abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean
 
             if (paymentInstrumentConnectorService.checkActive(model.getHpan(), model.getTrxDate())) {
                 //TODO: Distinzione fra BPD ed FA
-                Supplier<Boolean> lazyValue = () -> {
-                    pointTransactionProducerService.publishPointTransactionEvent(model);
-                    return true;
-                };
-                callAsyncService(lazyValue);
+                pointTransactionProducerService.publishPointTransactionEvent(model);
             }
 
             return true;
 
         } catch (Exception e) {
-            //TODO: Gestione errori transazione su coda dedicata
+            //TODO: Gestione errori transazione su coda dedicata ed acknowledgment
             if (logger.isErrorEnabled()) {
                 logger.error("Error occured during processing for transaction: " +
                         model.getIdTrxAcquirer() + ", " + model.getAcquirerCode() + ", " + model.getTrxDate());
+                throw e;
             }
         }
 
