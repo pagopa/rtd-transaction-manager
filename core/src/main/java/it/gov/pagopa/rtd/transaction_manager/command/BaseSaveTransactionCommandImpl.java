@@ -81,7 +81,7 @@ public abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean
             }
         }
 
-        return null;
+        return false;
     }
 
 

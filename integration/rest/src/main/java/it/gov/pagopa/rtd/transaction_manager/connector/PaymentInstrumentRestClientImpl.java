@@ -27,12 +27,10 @@ class PaymentInstrumentRestClientImpl extends BaseService implements PaymentInst
 
     @Override
     public Boolean checkActive(String hpan, OffsetDateTime accountingDate) {
-
         final HashMap<String, Object> params = new HashMap<>();
         params.put("id", hpan);
         final HashMap<String, Object> queryParams = new HashMap<>();
-        params.put("accountingDate", accountingDate.toString());
-
+        queryParams.put("accountingDate", accountingDate.toString());
         return connector.call(null, requestTransformer, responseTransformer, params, queryParams);
     }
 }
