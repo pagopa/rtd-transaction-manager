@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class OnTransactionSaveRequestListener extends BaseEventListener {
 
-    private final ModelFactory<Pair<byte[], Headers>,SaveTransactionCommandModel> saveTransactionCommandModelFactory;
+    private final ModelFactory<Pair<byte[], Headers>, SaveTransactionCommandModel> saveTransactionCommandModelFactory;
     private final BeanFactory beanFactory;
 
     @Autowired
