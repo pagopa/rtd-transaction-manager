@@ -6,4 +6,5 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransactionManagerErrorPublisherConnector
         extends BaseEventConnector<byte[], Boolean, byte[], Void> {
+
 }
