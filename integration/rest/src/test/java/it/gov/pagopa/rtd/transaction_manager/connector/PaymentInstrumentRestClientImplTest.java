@@ -25,23 +25,11 @@ public class PaymentInstrumentRestClientImplTest extends BaseRestConnectorTest {
     PaymentInstrumentRestClient paymentInstrumentRestClient;
 
     @Test
-    public void checkActiveTrue() {
+    public void checkActive() {
         try {
             Boolean isActive = paymentInstrumentRestClient.checkActive(
                     "test", OffsetDateTime.parse("2020-04-10T14:59:59.245Z"));
             Assert.assertTrue(isActive);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
-    }
-
-    @Test
-    public void checkActiveFalse() {
-        try {
-            Boolean isActive = paymentInstrumentRestClient.checkActive(
-                    "test", OffsetDateTime.parse("2020-04-11T14:59:59.245Z"));
-            Assert.assertFalse(isActive);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();

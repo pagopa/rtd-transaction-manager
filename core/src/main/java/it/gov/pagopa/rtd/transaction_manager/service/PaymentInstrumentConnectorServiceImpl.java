@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 
 @Service
 @Slf4j
-public class PaymentInstrumentConnectorServiceImpl
+class PaymentInstrumentConnectorServiceImpl
         implements PaymentInstrumentConnectorService {
 
     private final PaymentInstrumentRestClient paymentInstrumentRestClient;

@@ -62,8 +62,19 @@ public abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean
 
         try {
 
+            if (log.isDebugEnabled()) {
+                log.debug("Executing SaveTransactionCommand for transaction: " +
+                        model.getIdTrxAcquirer() + ", " + model.getAcquirerCode() + ", " + model.getTrxDate());
+        }
+
             if (paymentInstrumentConnectorService.checkActive(model.getHpan(), model.getTrxDate())) {
                 //TODO: Distinzione fra BPD ed FA
+
+                if (log.isDebugEnabled()) {
+                    log.debug("Publishing valid transaction: " +
+                        model.getIdTrxAcquirer() + ", " + model.getAcquirerCode() + ", " + model.getTrxDate());
+                }
+
                 pointTransactionProducerService.publishPointTransactionEvent(model);
             }
 
@@ -74,11 +85,10 @@ public abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean
             if (logger.isErrorEnabled()) {
                 logger.error("Error occured during processing for transaction: " +
                         model.getIdTrxAcquirer() + ", " + model.getAcquirerCode() + ", " + model.getTrxDate());
-                throw e;
             }
+            return false;
         }
 
-        return false;
     }
 
 

@@ -6,6 +6,7 @@ import eu.sia.meda.eventlistener.BaseEventListenerTest;
 import it.gov.pagopa.rtd.transaction_manager.command.BaseSaveTransactionCommandImpl;
 import it.gov.pagopa.rtd.transaction_manager.factory.SaveTransactionCommandModelFactory;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
+import it.gov.pagopa.rtd.transaction_manager.service.TransactionManagerErrorPublisherService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.BDDMockito;
@@ -47,6 +48,9 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
     @MockBean
     BaseSaveTransactionCommandImpl saveTransactionCommandMock;
 
+    @MockBean
+    TransactionManagerErrorPublisherService transactionManagerErrorPublisherServiceMock;
+
 
     @Before
     public void setUp() throws Exception {
@@ -54,6 +58,7 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
         Mockito.reset(
                 onTransactionSaveRequestListenerSpy,
                 saveTransactionCommandModelFactorySpy,
+                transactionManagerErrorPublisherServiceMock,
                 beanFactoryMock, saveTransactionCommandMock);
         Mockito.doReturn(true).when(saveTransactionCommandMock).execute();
 
@@ -100,7 +105,6 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
 
     @Override
     protected ErrorPublisherService getErrorPublisherService() {
-        //TODO: Gestione coda errore
-        return null;
+        return transactionManagerErrorPublisherServiceMock;
     }
 }
