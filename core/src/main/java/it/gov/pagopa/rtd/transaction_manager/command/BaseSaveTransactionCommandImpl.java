@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Scope;
 
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Slf4j
-public abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> implements SaveTransactionCommand {
+abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> implements SaveTransactionCommand {
 
     private SaveTransactionCommandModel saveTransactionCommandModel;
     private PaymentInstrumentConnectorService paymentInstrumentConnectorService;
