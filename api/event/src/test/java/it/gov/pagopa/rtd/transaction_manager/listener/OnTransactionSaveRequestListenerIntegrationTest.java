@@ -9,6 +9,7 @@ import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
+import it.gov.pagopa.rtd.transaction_manager.service.TransactionManagerErrorPublisherService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
 import org.mockito.BDDMockito;
@@ -27,7 +28,6 @@ import org.springframework.test.context.TestPropertySource;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 @ContextConfiguration(classes = {
         TestConfig.class,
@@ -42,12 +42,14 @@ import java.util.concurrent.CountDownLatch;
                 "classpath:config/testTransactionRequestListener.properties",
                 "classpath:config/testInvoiceTransactionPublisher.properties",
                 "classpath:config/testPointTransactionPublisher.properties",
+                "classpath:config/testTransactionManagerErrorPublisher.properties",
                 "classpath:config/PaymentInstrumentRestConnector.properties"
         },
         properties = {
                 "listeners.eventConfigurations.items.OnTransactionSaveRequestListener.bootstrapServers=${spring.embedded.kafka.brokers}",
                 "connectors.eventConfigurations.items.InvoiceTransactionPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
                 "connectors.eventConfigurations.items.PointTransactionPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
+                "connectors.eventConfigurations.items.TransactionManagerErrorPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
                 "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.mocked=true",
                 "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.path=payment-instrument/test/history"
         })
@@ -75,10 +77,11 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
     @SpyBean
     SaveTransactionCommandModelFactory saveTransactionCommandModelFactorySpy;
 
+    @SpyBean
+    TransactionManagerErrorPublisherService transactionManagerErrorPublisherService;
+
     @Autowired
     ObjectMapper objectMapper;
-
-    private CountDownLatch latch;
 
     @Override
     protected Transaction getRequestObject() {
