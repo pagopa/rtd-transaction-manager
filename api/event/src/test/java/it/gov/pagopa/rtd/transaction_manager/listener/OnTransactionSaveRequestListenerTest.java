@@ -79,7 +79,6 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
                         .idTrxIssuer(0)
                         .amountCurrency("833")
                         .correlationId(1)
-                        .awardPeriodId(0L)
                         .acquirerId(0)
                         .build();
     }

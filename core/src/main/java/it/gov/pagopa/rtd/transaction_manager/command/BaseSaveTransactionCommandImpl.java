@@ -65,17 +65,18 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             if (log.isDebugEnabled()) {
                 log.debug("Executing SaveTransactionCommand for transaction: " +
                         model.getIdTrxAcquirer() + ", " + model.getAcquirerCode() + ", " + model.getTrxDate());
-        }
+            }
 
             if (paymentInstrumentConnectorService.checkActive(model.getHpan(), model.getTrxDate())) {
                 //TODO: Distinzione fra BPD ed FA
-
                 if (log.isDebugEnabled()) {
-                    log.debug("Publishing valid transaction: " +
-                        model.getIdTrxAcquirer() + ", " + model.getAcquirerCode() + ", " + model.getTrxDate());
+                    log.debug("Publishing valid transaction");
                 }
-
                 pointTransactionProducerService.publishPointTransactionEvent(model);
+            } else {
+                if (log.isInfoEnabled()) {
+                    log.info("Met a transaction for an unactive payment instrument. Discarding.");
+                }
             }
 
             return true;

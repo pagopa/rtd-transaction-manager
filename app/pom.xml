@@ -17,6 +17,11 @@
             <artifactId>rtd-ms-transaction-manager-api-event</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>it.gov.pagopa.rtd.ms.transaction_manager.api</groupId>
+            <artifactId>rtd-ms-transaction-manager-api-rest</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

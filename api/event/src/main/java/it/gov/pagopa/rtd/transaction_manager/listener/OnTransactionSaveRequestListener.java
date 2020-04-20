@@ -47,8 +47,13 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
                     saveTransactionCommandModelFactory.createModel(Pair.of(payload, headers));
             SaveTransactionCommand command = beanFactory.getBean(
                     SaveTransactionCommand.class, saveTransactionCommandModel);
+
             if (!command.execute()) {
                 throw new Exception("Failed to execute SaveTransactionCommand");
+            }
+
+            if (log.isDebugEnabled()) {
+                log.debug("SaveTransactionCommand successfully executed for inbound message");
             }
 
         } catch (Exception e) {
