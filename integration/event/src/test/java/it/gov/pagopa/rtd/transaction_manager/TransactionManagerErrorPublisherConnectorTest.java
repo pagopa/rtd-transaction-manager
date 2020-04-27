@@ -8,6 +8,11 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author Alessio Cialini
+ * Test class for the TransactionManagerErrorPublisherConnector class
+ */
+
 @Import({TransactionManagerErrorPublisherConnector.class})
 @TestPropertySource(
         locations = "classpath:config/testTransactionManagerErrorPublisher.properties",

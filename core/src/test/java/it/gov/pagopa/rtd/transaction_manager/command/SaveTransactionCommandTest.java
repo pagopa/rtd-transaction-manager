@@ -22,6 +22,11 @@ import org.springframework.test.context.ContextConfiguration;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+/**
+ * @author Alessio Cialini
+ * Test class for the SaveTransactionCommand method
+ */
+
 @ContextConfiguration(classes = SaveTransactionCommandImpl.class)
 public class SaveTransactionCommandTest extends BaseSpringTest {
 

@@ -12,6 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.OffsetDateTime;
 
+/**
+ * @author Alessio Cialini
+ * Test class for the PaymentInstrumentConnectorService method
+ */
+
 public class PaymentInstrumentConnectorServiceTest extends BaseTest {
 
     @Mock

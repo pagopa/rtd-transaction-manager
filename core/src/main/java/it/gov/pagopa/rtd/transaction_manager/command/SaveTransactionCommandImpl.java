@@ -9,6 +9,12 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Alessio Cialini
+ * implementation of the SaveTransactionCommand interface, extends the BaseSaveTransactionCommandImpl class.
+ * Defines the proper implementation, it's used in the beanFactory construction
+ */
+
 @Component
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Slf4j

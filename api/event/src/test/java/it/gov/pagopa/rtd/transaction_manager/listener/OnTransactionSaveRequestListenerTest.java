@@ -21,6 +21,11 @@ import org.springframework.test.context.TestPropertySource;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+/**
+ * @author Alessio Cialini
+ * Test class for the OnTransactionSaveRequestListener method
+ */
+
 @Import({OnTransactionSaveRequestListener.class})
 @TestPropertySource(
         locations = "classpath:config/testTransactionRequestListener.properties",

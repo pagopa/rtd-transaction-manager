@@ -9,6 +9,11 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+/**
+ * @author Alessio Cialini
+ * Model for transaction to be sent in the outbound channel
+ */
+
 @Data
 @Builder
 @NoArgsConstructor

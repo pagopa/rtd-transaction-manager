@@ -10,6 +10,11 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.OffsetDateTime;
 
+/**
+ * @author Alessio Cialini
+ * test class for the REST client
+ */
+
 @Import({PaymentInstrumentRestClientImpl.class, PaymentInstrumentRestConnector.class, ArchMedaInternalConnectorConfigurationService.class})
 @TestPropertySource(
         locations = {

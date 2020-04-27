@@ -7,6 +7,12 @@ import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author Alessio Cialini
+ * Implementation of the InvoiceTransactionPublisherService, defines the service used for the interaction
+ * with the InvoiceTransactionPublisherConnector
+ */
+
 @Service
 class InvoiceTransactionPublisherServiceImpl implements InvoiceTransactionPublisherService {
 
@@ -22,6 +28,12 @@ class InvoiceTransactionPublisherServiceImpl implements InvoiceTransactionPublis
         this.simpleEventRequestTransformer = simpleEventRequestTransformer;
         this.simpleEventResponseTransformer = simpleEventResponseTransformer;
     }
+
+    /**
+     * Calls the invoiceTransactionPublisherConnector, passing the transaction to be used as message payload
+     * @param transaction
+     *              Transaction instance to be used as payload for the outbound channel used bu the related connector
+     */
 
     @Override
     public void publishInvoiceTransactionEvent(Transaction transaction) {

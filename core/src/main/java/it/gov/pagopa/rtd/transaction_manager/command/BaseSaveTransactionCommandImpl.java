@@ -12,6 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
+/**
+ * @author Alessio Cialini
+ * Base implementation of the SaveTransactionCommandInterface, extending Meda BaseCommand class, the command
+ * represents the class interacted with at api level, hiding the multiple calls to the integration connectors
+ */
+
 @Scope(BeanDefinition.SCOPE_PROTOTYPE)
 @Slf4j
 abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> implements SaveTransactionCommand {
@@ -53,6 +59,13 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
     }
+
+    /**
+     * Implementation of the MEDA Command doExecute method, contains the logic for the inbound transaction
+     * management, calls the REST endpoint to check if it the related paymentInstrument is active, and eventually
+     * sends the Transaction to the proper outbound channel. In case of an error, send a
+     * @return boolean to indicate if the command is succesfully executed
+     */
 
     @SneakyThrows
     @Override

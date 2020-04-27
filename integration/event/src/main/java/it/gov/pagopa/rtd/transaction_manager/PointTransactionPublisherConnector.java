@@ -6,10 +6,28 @@ import eu.sia.meda.event.transformer.IEventResponseTransformer;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author ALessio Cialini
+ * Class extending the MEDA BaseEventConnector, is responsile for calling a Kafka outbound channel with messages
+ * containing a json mapped on the Transaction class
+ */
+
 @Service
 public class PointTransactionPublisherConnector
         extends BaseEventConnector<Transaction, Boolean, Transaction, Void> {
 
+    /**
+     *
+     * @param transaction
+    Transaction instance to be used as message content
+     * @param requestTransformer
+    Trannsformer for the request data
+     * @param responseTransformer
+    Transformer for the call response
+     * @param args
+    Additional args to be used in the call
+     * @return Exit status for the call
+     */
     public Boolean doCall(
             Transaction transaction, IEventRequestTransformer<Transaction,
             Transaction> requestTransformer,

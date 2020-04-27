@@ -9,6 +9,12 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 
+/**
+ * @author Alessio Cialini
+ * Implementation of the PaymentInstrumentRestClient interface, the class contains the logic for the creation
+ * of the query to pass at the connector call
+ */
+
 @Service
 class PaymentInstrumentRestClientImpl extends BaseService implements PaymentInstrumentRestClient{
 
@@ -25,6 +31,15 @@ class PaymentInstrumentRestClientImpl extends BaseService implements PaymentInst
         this.responseTransformer = responseTransformer;
     }
 
+    /**
+     * Method to execute a call at the REST enpoint regarding the request of the status of an intrument,
+     * identified from an hpan, and given a particular accountingDate
+     * @param hpan
+     *          hpan to identify a particular payment instrument
+     * @param accountingDate
+     *          date on which the payment instrument should be active
+     * @return a boolean in response, defining if the payment instrument results aactive or not
+     */
     @Override
     public Boolean checkActive(String hpan, OffsetDateTime accountingDate) {
         final HashMap<String, Object> params = new HashMap<>();

@@ -8,6 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
+/**
+ * @author Alessio Cialini
+ * Test class for the InvoiceTransactionPublisherConnector class
+ */
+
 @Import({InvoiceTransactionPublisherConnector.class})
 @TestPropertySource(
         locations = "classpath:config/testInvoiceTransactionPublisher.properties",

@@ -19,6 +19,11 @@ import org.springframework.test.context.ContextConfiguration;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
+/**
+ * @author Alessio Cialini
+ * Test class for the PointTransactionPublisherService method
+ */
+
 @ContextConfiguration(classes = PointTransactionPublisherServiceImpl.class)
 public class PointTransactionPublisherServiceTest extends BaseSpringTest {
 

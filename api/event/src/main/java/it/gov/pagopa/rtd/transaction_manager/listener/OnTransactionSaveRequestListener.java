@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * @author Alessio Cialini
+ *
+ */
+
 @Service
 @Slf4j
 public class OnTransactionSaveRequestListener extends BaseEventListener {
@@ -32,6 +37,17 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
         this.saveTransactionCommandModelFactory = saveTransactionCommandModelFactory;
         this.beanFactory = beanFactory;
     }
+
+    /**
+     * Method called on receiving a message in the inbound queue,
+     * that should contain a JSON payload containing transaction data,
+     * calls on a command to execute the check and send logic for the input Transaction data
+     * In case of error, sends data to an error channel
+     * @param payload
+     *          Message JSON payload in byte[] format
+     * @param headers
+     *          Kafka headers from the inbound message
+     */
 
     @SneakyThrows
     @Override

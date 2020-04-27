@@ -8,6 +8,12 @@ import it.gov.pagopa.rtd.transaction_manager.TransactionManagerErrorPublisherCon
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author Alessio Cialini
+ * Implementation of the TransactionManagerErrorPublisherService, extends the BaseErrorPublisherService,
+ * the connector has the respnsability to send error related messages on the appropriate queue
+ */
+
 @Service
 class TransactionManagerErrorPublisherServiceImpl
         extends BaseErrorPublisherService
