@@ -1,2 +1,2 @@
 # rtd-transaction-manager
-Il componente Transaction Manager si occupa della gestione degli eventi legati alle transazioni per il programma di bonus pagamenti digitali.
+The Transaction Manager components manages the inbound requests related to the transactions involved in the program 'Bonus Pagamenti Digitali'
