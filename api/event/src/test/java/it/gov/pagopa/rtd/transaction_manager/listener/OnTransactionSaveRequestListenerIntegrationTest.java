@@ -30,7 +30,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
- * @author Alessio Cialini
  * Integration Testing class for the whole microservice, it executes the entire flow starting from the
  * inbound event listener, to the production of a message in the outbound channel
  */

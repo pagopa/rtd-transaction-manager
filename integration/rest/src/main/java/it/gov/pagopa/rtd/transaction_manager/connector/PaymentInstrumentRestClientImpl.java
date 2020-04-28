@@ -10,7 +10,6 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 
 /**
- * @author Alessio Cialini
  * Implementation of the PaymentInstrumentRestClient interface, the class contains the logic for the creation
  * of the query to pass at the connector call
  */

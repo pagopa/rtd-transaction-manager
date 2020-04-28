@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @author Alessio Cialini
- *
+ * Class Extending the MEDA BaseEventListener, manages the inbound requests, and calls on the appropriate
+ * command for the check and send logic associated to the Transaction payload
  */
 
 @Service

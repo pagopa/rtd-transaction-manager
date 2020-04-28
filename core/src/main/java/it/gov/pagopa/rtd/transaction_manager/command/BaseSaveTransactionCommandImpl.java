@@ -13,7 +13,6 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
 /**
- * @author Alessio Cialini
  * Base implementation of the SaveTransactionCommandInterface, extending Meda BaseCommand class, the command
  * represents the class interacted with at api level, hiding the multiple calls to the integration connectors
  */

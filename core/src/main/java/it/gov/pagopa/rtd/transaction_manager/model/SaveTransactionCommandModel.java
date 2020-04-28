@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.apache.kafka.common.header.Headers;
 
 /**
- * @author Alessio Cialini
  *  Model containing the inbound message data
  */
 

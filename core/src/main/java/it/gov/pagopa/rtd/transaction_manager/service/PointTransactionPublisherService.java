@@ -3,7 +3,6 @@ package it.gov.pagopa.rtd.transaction_manager.service;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 
 /**
- * @author Alessio Cialini
  * public interface for the PointTransactionPublisherService
  */
 public interface PointTransactionPublisherService {

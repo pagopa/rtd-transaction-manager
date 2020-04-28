@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 /**
- * @author Alessio Cialini
  * Test class for the OnTransactionSaveRequestListener method
  */
 

@@ -3,7 +3,6 @@ package it.gov.pagopa.rtd.transaction_manager.service;
 import java.time.OffsetDateTime;
 
 /**
- * @author Alessio Cialini
  * public interface for the PaymentInstrumentConnectorService
  */
 

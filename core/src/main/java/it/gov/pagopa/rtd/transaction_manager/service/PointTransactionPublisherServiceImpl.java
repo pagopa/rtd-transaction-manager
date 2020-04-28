@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * @author Alessio Cialini
  * Implementation of the PointTransactionPublisherService, defines the service used for the interaction
  * with the PointTransactionPublisherConnector
  */

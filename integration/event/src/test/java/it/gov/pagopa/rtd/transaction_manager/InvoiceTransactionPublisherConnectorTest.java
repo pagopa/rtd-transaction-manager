@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 /**
- * @author Alessio Cialini
  * Test class for the InvoiceTransactionPublisherConnector class
  */
 

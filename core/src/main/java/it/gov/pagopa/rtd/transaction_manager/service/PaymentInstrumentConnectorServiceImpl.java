@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
 
 /**
- * @author Alessio Cialini
  * Implementation of the PaymentInstrumentConnectorService, it's responsible for calling the connector related
  * to the REST endpoint for the checking active payment instruments in the related microservice
  */
