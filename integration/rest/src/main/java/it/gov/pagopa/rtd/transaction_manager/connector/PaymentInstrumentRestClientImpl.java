@@ -31,7 +31,7 @@ class PaymentInstrumentRestClientImpl extends BaseService implements PaymentInst
     }
 
     /**
-     * Method to execute a call at the REST enpoint regarding the request of the status of an intrument,
+     * Method to execute a call at the REST endpoint regarding the request of the status of an intrument,
      * identified from an hpan, and given a particular accountingDate
      * @param hpan
      *          hpan to identify a particular payment instrument

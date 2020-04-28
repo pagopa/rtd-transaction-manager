@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * Implementation of the TransactionManagerErrorPublisherService, extends the BaseErrorPublisherService,
- * the connector has the respnsability to send error related messages on the appropriate queue
+ * the connector has the responsibility to send error related messages on the appropriate queue
  */
 
 @Service

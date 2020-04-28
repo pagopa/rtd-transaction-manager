@@ -5,6 +5,7 @@ import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 /**
  * public interface for the PointTransactionPublisherService
  */
+
 public interface PointTransactionPublisherService {
 
     /**
