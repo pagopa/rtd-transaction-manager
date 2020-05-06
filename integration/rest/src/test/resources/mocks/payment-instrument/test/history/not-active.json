@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "?accountingDate=2020-04-11T14:59:59.245Z",
+    "headers": {
+      "x-request-id": {
+        "anything": true
+      }
+    }
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": "false",
+    "headers": {
+      "Content-Type": "application/hal+json"
+    }
+  }
+}

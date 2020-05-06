@@ -1,6 +1,7 @@
 package it.gov.pagopa.rtd.transaction_manager.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.sia.meda.connector.meda.ArchMedaInternalConnectorConfigurationService;
 import eu.sia.meda.event.service.ErrorPublisherService;
 import eu.sia.meda.eventlistener.BaseEventListenerIntegrationTest;
 import it.gov.pagopa.rtd.transaction_manager.factory.SaveTransactionCommandModelFactory;
@@ -10,6 +11,7 @@ import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisher
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.TransactionManagerErrorPublisherService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
 import org.mockito.BDDMockito;
@@ -40,7 +42,8 @@ import java.util.List;
         JacksonAutoConfiguration.class,
         ObjectPostProcessorConfiguration.class,
         AuthenticationConfiguration.class,
-        KafkaAutoConfiguration.class
+        KafkaAutoConfiguration.class,
+        ArchMedaInternalConnectorConfigurationService.class
 })
 @TestPropertySource(
         locations = {
@@ -121,8 +124,12 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
     protected void verifyPublishedMessages(List<ConsumerRecord<String, String>> records) {
 
         try {
+
             Transaction sentTransaction = getRequestObject();
             Assert.assertEquals(1,records.size());
+            Assert.assertEquals(getRequestObject(),objectMapper.readValue(records.get(0).value(), Transaction.class));
+            BDDMockito.verify(saveTransactionCommandModelFactorySpy).createModel(
+                    Mockito.eq(Pair.of(objectMapper.writeValueAsBytes(sentTransaction),Mockito.any())));
             BDDMockito.verify(paymentInstrumentConnectorServiceSpy, Mockito.atLeastOnce())
                     .checkActive(Mockito.eq(sentTransaction.getHpan()),
                             Mockito.eq(sentTransaction.getTrxDate()));

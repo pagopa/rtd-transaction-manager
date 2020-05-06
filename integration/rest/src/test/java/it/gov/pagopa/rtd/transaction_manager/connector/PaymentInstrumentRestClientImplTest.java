@@ -22,6 +22,7 @@ import java.time.OffsetDateTime;
         },
         properties = {
                 "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.mocked=true",
+                "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.randomMock=false",
                 "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.path=payment-instrument/test/history"
         })
 public class PaymentInstrumentRestClientImplTest extends BaseRestConnectorTest {
@@ -35,6 +36,18 @@ public class PaymentInstrumentRestClientImplTest extends BaseRestConnectorTest {
             Boolean isActive = paymentInstrumentRestClient.checkActive(
                     "test", OffsetDateTime.parse("2020-04-10T14:59:59.245Z"));
             Assert.assertTrue(isActive);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
+    @Test
+    public void checkNotActive() {
+        try {
+            Boolean isActive = paymentInstrumentRestClient.checkActive(
+                    "test", OffsetDateTime.parse("2020-04-11T14:59:59.245Z"));
+            Assert.assertFalse(isActive);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
