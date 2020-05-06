@@ -11,7 +11,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -47,9 +46,6 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
     SaveTransactionCommandModelFactory saveTransactionCommandModelFactorySpy;
 
     @MockBean
-    BeanFactory beanFactoryMock;
-
-    @MockBean
     SaveTransactionCommand saveTransactionCommandMock;
 
     @MockBean
@@ -63,7 +59,7 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
                 onTransactionSaveRequestListenerSpy,
                 saveTransactionCommandModelFactorySpy,
                 transactionManagerErrorPublisherServiceMock,
-                beanFactoryMock, saveTransactionCommandMock);
+                saveTransactionCommandMock);
         Mockito.doReturn(true).when(saveTransactionCommandMock).execute();
 
     }

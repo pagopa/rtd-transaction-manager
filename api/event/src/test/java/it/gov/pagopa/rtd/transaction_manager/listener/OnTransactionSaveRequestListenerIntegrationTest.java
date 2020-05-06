@@ -11,7 +11,6 @@ import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisher
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.TransactionManagerErrorPublisherService;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
 import org.mockito.BDDMockito;
@@ -126,10 +125,10 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
         try {
 
             Transaction sentTransaction = getRequestObject();
+            sentTransaction.setTrxDate(OffsetDateTime.parse("2020-04-10T16:59:59.245+02:00"));
             Assert.assertEquals(1,records.size());
-            Assert.assertEquals(getRequestObject(),objectMapper.readValue(records.get(0).value(), Transaction.class));
-            BDDMockito.verify(saveTransactionCommandModelFactorySpy).createModel(
-                    Mockito.eq(Pair.of(objectMapper.writeValueAsBytes(sentTransaction),Mockito.any())));
+            Transaction publishedTransaction = objectMapper.readValue(records.get(0).value(), Transaction.class);
+            Assert.assertEquals(sentTransaction, publishedTransaction);
             BDDMockito.verify(paymentInstrumentConnectorServiceSpy, Mockito.atLeastOnce())
                     .checkActive(Mockito.eq(sentTransaction.getHpan()),
                             Mockito.eq(sentTransaction.getTrxDate()));
