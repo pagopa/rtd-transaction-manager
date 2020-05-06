@@ -8,7 +8,9 @@ import it.gov.pagopa.rtd.transaction_manager.PointTransactionPublisherConnector;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ public class PointTransactionPublisherServiceTest extends BaseSpringTest {
 
     private Transaction transaction;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Before
     public void setUp() throws Exception {
         Mockito.reset(
@@ -75,6 +80,22 @@ public class PointTransactionPublisherServiceTest extends BaseSpringTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @Test
+    public void publishInvoiceTransactionEvent_KO() {
+
+        BDDMockito.doAnswer(invocationOnMock -> {
+            throw new Exception();
+        }).when(pointTransactionPublisherConnectorMock)
+                .doCall(Mockito.eq(null), Mockito.any(), Mockito.any());
+
+        expectedException.expect(Exception.class);
+        pointTransactionPublisherService.publishPointTransactionEvent(null);
+        BDDMockito.verify(pointTransactionPublisherConnectorMock,Mockito.atLeastOnce())
+                .doCall(Mockito.eq(transaction),
+                        Mockito.eq(simpleEventRequestTransformerSpy),
+                        Mockito.eq(simpleEventResponseTransformerSpy));
     }
 
     protected Transaction getRequestObject() {

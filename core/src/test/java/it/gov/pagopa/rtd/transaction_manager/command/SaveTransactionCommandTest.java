@@ -136,6 +136,37 @@ public class SaveTransactionCommandTest extends BaseSpringTest {
 
     }
 
+    @Test
+    public void test_PublisherKO() {
+
+        Transaction transaction = getRequestObject();
+        SaveTransactionCommand saveTransactionCommand = buildCommandInstance();
+
+        try {
+
+            BDDMockito.doReturn(true).when(paymentInstrumentConnectorServiceMock)
+                    .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+            BDDMockito.doAnswer(invocationOnMock -> {
+                throw new Exception("Some Exception");
+            }).when(pointTransactionProducerServiceMock)
+              .publishPointTransactionEvent(Mockito.any());
+
+            Boolean isOk = saveTransactionCommand.execute();
+
+            Assert.assertFalse(isOk);
+            BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
+                    .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+            BDDMockito.verify(pointTransactionProducerServiceMock, Mockito.atLeastOnce())
+                    .publishPointTransactionEvent(Mockito.eq(transaction));
+            BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
+    }
+
     protected SaveTransactionCommand buildCommandInstance() {
         return beanFactory.getBean(
                 SaveTransactionCommand.class,

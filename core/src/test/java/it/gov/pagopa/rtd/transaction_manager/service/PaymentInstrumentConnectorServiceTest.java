@@ -2,9 +2,12 @@ package it.gov.pagopa.rtd.transaction_manager.service;
 
 import eu.sia.meda.BaseTest;
 import it.gov.pagopa.rtd.transaction_manager.connector.PaymentInstrumentRestClient;
+import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,6 +28,9 @@ public class PaymentInstrumentConnectorServiceTest extends BaseTest {
     PaymentInstrumentConnectorService paymentInstrumentConnectorService;
 
     private final OffsetDateTime accountingDate = OffsetDateTime.now();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -60,5 +66,20 @@ public class PaymentInstrumentConnectorServiceTest extends BaseTest {
             e.printStackTrace();
             Assert.fail();
         }
+    }
+
+    @SneakyThrows
+    @Test
+    public void connector_KO() {
+
+        BDDMockito.doAnswer(invocationOnMock -> {
+            throw new Exception();
+        }).when(paymentInstrumentRestClient)
+                .checkActive(Mockito.any(), Mockito.any());
+
+        expectedException.expect(Exception.class);
+        paymentInstrumentConnectorService.checkActive("notactivepan", accountingDate);
+        BDDMockito.verify(paymentInstrumentRestClient, Mockito.atLeastOnce()).checkActive(
+                Mockito.eq("notactivepan"), Mockito.eq(accountingDate));
     }
 }
