@@ -1,8 +1,8 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
-import eu.sia.meda.BaseSpringTest;
 import eu.sia.meda.async.util.AsyncUtils;
 import eu.sia.meda.core.model.ApplicationContext;
+import it.gov.pagopa.bpd.common.BaseTest;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
@@ -12,12 +12,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.BDDMockito;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.ContextConfiguration;
+import org.mockito.Spy;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -26,21 +23,18 @@ import java.time.OffsetDateTime;
  * Test class for the SaveTransactionCommand method
  */
 
-@ContextConfiguration(classes = SaveTransactionCommandImpl.class)
-public class SaveTransactionCommandTest extends BaseSpringTest {
+public class SaveTransactionCommandTest extends BaseTest {
 
-    @MockBean
+    @Mock
     PaymentInstrumentConnectorService paymentInstrumentConnectorServiceMock;
-    @MockBean
+    @Mock
     PointTransactionPublisherService pointTransactionProducerServiceMock;
-    @MockBean
+    @Mock
     InvoiceTransactionPublisherService invoiceTransactionProducerServiceMock;
-    @SpyBean
+    @Spy
     ApplicationContext applicationContext;
-    @SpyBean
+    @Spy
     AsyncUtils asyncUtils;
-    @Autowired
-    BeanFactory beanFactory;
 
     @Before
     public void initTest() {
@@ -50,6 +44,8 @@ public class SaveTransactionCommandTest extends BaseSpringTest {
                 pointTransactionProducerServiceMock,
                 invoiceTransactionProducerServiceMock,
                 asyncUtils);
+
+
 
     }
 
@@ -168,9 +164,13 @@ public class SaveTransactionCommandTest extends BaseSpringTest {
     }
 
     protected SaveTransactionCommand buildCommandInstance() {
-        return beanFactory.getBean(
-                SaveTransactionCommand.class,
-                SaveTransactionCommandModel.builder().payload(getRequestObject()).headers(null).build());
+        return new SaveTransactionCommandImpl(
+                SaveTransactionCommandModel.builder().payload(getRequestObject()).headers(null).build(),
+                paymentInstrumentConnectorServiceMock,
+                pointTransactionProducerServiceMock,
+                invoiceTransactionProducerServiceMock
+
+        );
     }
 
     protected Transaction getRequestObject() {

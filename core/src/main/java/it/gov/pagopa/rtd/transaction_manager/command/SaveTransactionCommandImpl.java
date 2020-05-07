@@ -35,4 +35,9 @@ class SaveTransactionCommandImpl extends BaseSaveTransactionCommandImpl implemen
               invoiceTransactionProducerService);
     }
 
+    @Override
+    public Boolean doExecute() {
+        return super.doExecute();
+    }
+
 }
