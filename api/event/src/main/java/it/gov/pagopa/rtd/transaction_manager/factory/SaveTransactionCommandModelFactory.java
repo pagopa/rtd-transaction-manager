@@ -9,10 +9,8 @@ import org.apache.kafka.common.header.Headers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.validation.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 /**
  * Implementation of the ModelFactory interface, that maps a pair containing Kafka related byte[] payload and Headers
@@ -23,8 +21,6 @@ import java.util.Set;
 public class SaveTransactionCommandModelFactory implements
         ModelFactory<Pair<byte[], Headers>, SaveTransactionCommandModel>  {
 
-    private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    private static final Validator validator = factory.getValidator();
     private final ObjectMapper objectMapper;
 
     @Autowired
@@ -43,7 +39,6 @@ public class SaveTransactionCommandModelFactory implements
     @Override
     public SaveTransactionCommandModel createModel(Pair<byte[], Headers> requestData) {
         Transaction transaction = parsePayload(requestData.getLeft());
-        validateRequest(transaction);
         SaveTransactionCommandModel saveTransactionCommandModel =
                 SaveTransactionCommandModel.builder()
                     .payload(transaction)
@@ -66,19 +61,6 @@ public class SaveTransactionCommandModelFactory implements
         } catch (IOException e) {
             throw new IllegalArgumentException(
                     String.format("Cannot parse the payload as a valid %s", Transaction.class), e);
-        }
-    }
-
-    /**
-     * Method to process a validation check for the parsed Transaction request
-     * @param request
-     *          instance of Transaction, parsed from the inbound byye[] payload
-     * @throws ConstraintViolationException
-     */
-    private void validateRequest(Transaction request) {
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(request);
-        if (constraintViolations.size() > 0) {
-            throw new ConstraintViolationException(constraintViolations);
         }
     }
 

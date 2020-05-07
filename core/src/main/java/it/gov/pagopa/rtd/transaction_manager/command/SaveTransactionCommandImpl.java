@@ -1,9 +1,11 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
+import it.gov.pagopa.rtd.transaction_manager.service.TransactionManagerErrorPublisherService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
@@ -28,11 +30,15 @@ class SaveTransactionCommandImpl extends BaseSaveTransactionCommandImpl implemen
             SaveTransactionCommandModel saveTransactionCommandModel,
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
-            InvoiceTransactionPublisherService invoiceTransactionProducerService) {
+            InvoiceTransactionPublisherService invoiceTransactionProducerService,
+            TransactionManagerErrorPublisherService transactionManagerErrorPublisherService,
+            ObjectMapper objectMapper) {
         super(saveTransactionCommandModel,
               paymentInstrumentConnectorService,
               pointTransactionProducerService,
-              invoiceTransactionProducerService);
+              invoiceTransactionProducerService,
+                transactionManagerErrorPublisherService,
+                objectMapper);
     }
 
     @Override

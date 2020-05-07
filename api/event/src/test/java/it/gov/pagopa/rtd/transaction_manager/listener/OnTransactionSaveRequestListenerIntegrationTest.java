@@ -91,7 +91,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
     ObjectMapper objectMapper;
 
     @Override
-    protected Transaction getRequestObject() {
+    protected Object getRequestObject() {
          return Transaction.builder()
                 .idTrxAcquirer(1)
                 .acquirerCode("001")
@@ -124,7 +124,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
 
         try {
 
-            Transaction sentTransaction = getRequestObject();
+            Transaction sentTransaction = (Transaction) getRequestObject();
             sentTransaction.setTrxDate(OffsetDateTime.parse("2020-04-10T16:59:59.245+02:00"));
             Assert.assertEquals(1,records.size());
             Transaction publishedTransaction = objectMapper.readValue(records.get(0).value(), Transaction.class);
