@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "?accountingDate=2020-04-10T16:59:59.245+02:00",
+    "url": "?accountingDate=2020-04-10T16:59:59.245%2B02:00",
     "headers": {
       "x-request-id": {
         "anything": true
