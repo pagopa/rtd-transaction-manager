@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.TestPropertySource;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -16,6 +17,11 @@ import java.util.List;
  * inbound event listener, to the production of a message in the outbound error channel
  */
 
+@TestPropertySource(
+        properties = {
+                "connectors.eventConfigurations.items.TransactionManagerErrorPublisherConnector.topic:rtd-trx-val-error"
+        }
+)
 public class OnTransactionSaveRequestListenerValidationErrorIntegrationTest extends OnTransactionSaveRequestListenerIntegrationTest {
 
     @Value("${connectors.eventConfigurations.items.TransactionManagerErrorPublisherConnector.topic}")
