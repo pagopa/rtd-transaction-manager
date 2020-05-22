@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "url": "?accountingDate=2020-04-10T16:59:59.245%2B02:00",
+    "url": "/bpd/payment-instruments/test/history/active?accountingDate=2020-04-10T16%3A59%3A59.245%2B02%3A00",
     "headers": {
       "x-request-id": {
         "anything": true
