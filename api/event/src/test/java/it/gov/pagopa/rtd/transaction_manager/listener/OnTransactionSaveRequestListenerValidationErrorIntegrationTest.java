@@ -37,7 +37,7 @@ public class OnTransactionSaveRequestListenerValidationErrorIntegrationTest exte
                 .hpan("test")
                 .merchantId(0)
                 .circuitType("00")
-                .mcc("813")
+                .mcc("815")
                 .idTrxIssuer(0)
                 .amountCurrency("833")
                 .correlationId(1)
