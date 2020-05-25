@@ -1,6 +1,7 @@
 package it.gov.pagopa.rtd.transaction_manager.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import eu.sia.meda.connector.meda.ArchMedaInternalConnectorConfigurationService;
 import eu.sia.meda.event.service.ErrorPublisherService;
 import eu.sia.meda.eventlistener.BaseEventListenerIntegrationTest;
@@ -11,8 +12,10 @@ import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisher
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.TransactionManagerErrorPublisherService;
+import lombok.SneakyThrows;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
+import org.junit.ClassRule;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,51 +25,72 @@ import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.openfeign.FeignAutoConfiguration;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.TestPropertySourceUtils;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 /**
  * Integration Testing class for the whole microservice, it executes the entire flow starting from the
  * inbound event listener, to the production of a message in the outbound channel
  */
 
-@AutoConfigureWireMock(stubs = "classpath:/mocks/payment-instrument/test/history")
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {
-        TestConfig.class,
-        RestTemplateAutoConfiguration.class,
-        JacksonAutoConfiguration.class,
-        ObjectPostProcessorConfiguration.class,
-        AuthenticationConfiguration.class,
-        KafkaAutoConfiguration.class,
-        ArchMedaInternalConnectorConfigurationService.class,
-        FeignAutoConfiguration.class
-})
+@ContextConfiguration(initializers = OnTransactionSaveRequestListenerIntegrationTest.RandomPortInitializer.class,
+        classes = {
+                TestConfig.class,
+                RestTemplateAutoConfiguration.class,
+                JacksonAutoConfiguration.class,
+                ObjectPostProcessorConfiguration.class,
+                AuthenticationConfiguration.class,
+                KafkaAutoConfiguration.class,
+                ArchMedaInternalConnectorConfigurationService.class,
+                FeignAutoConfiguration.class
+        })
 @TestPropertySource(
         locations = {
                 "classpath:config/testTransactionRequestListener.properties",
                 "classpath:config/testInvoiceTransactionPublisher.properties",
                 "classpath:config/testPointTransactionPublisher.properties",
-                "classpath:config/testTransactionManagerErrorPublisher.properties",
-                "classpath:config/PaymentInstrumentRestConnector.properties"
+                "classpath:config/testTransactionManagerErrorPublisher.properties"
         },
         properties = {
                 "listeners.eventConfigurations.items.OnTransactionSaveRequestListener.bootstrapServers=${spring.embedded.kafka.brokers}",
                 "connectors.eventConfigurations.items.InvoiceTransactionPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
                 "connectors.eventConfigurations.items.PointTransactionPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
-                "connectors.eventConfigurations.items.TransactionManagerErrorPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
-                "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.mocked=true",
-                "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.path=payment-instrument/test/history"
+                "connectors.eventConfigurations.items.TransactionManagerErrorPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}"
         })
 public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventListenerIntegrationTest {
+
+    @ClassRule
+    public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig()
+            .dynamicPort()
+            .usingFilesUnderClasspath("stubs/payment-instrument")
+    );
+
+    public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @SneakyThrows
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            TestPropertySourceUtils
+                    .addInlinedPropertiesToEnvironment(applicationContext,
+                            String.format("rest-client.payment-instrument.base-url=http://%s:%d/bpd/payment-instruments",
+                                    wireMockRule.getOptions().bindAddress(),
+                                    wireMockRule.port())
+                    );
+
+        }
+    }
 
     @Value("${listeners.eventConfigurations.items.OnTransactionSaveRequestListener.topic}")
     private String topicSubscription;
@@ -98,7 +122,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
 
     @Override
     protected Object getRequestObject() {
-         return Transaction.builder()
+        return Transaction.builder()
                 .idTrxAcquirer(1)
                 .acquirerCode("001")
                 .trxDate(OffsetDateTime.parse("2020-04-10T14:59:59.245Z"))
@@ -132,7 +156,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
 
             Transaction sentTransaction = (Transaction) getRequestObject();
             sentTransaction.setTrxDate(OffsetDateTime.parse("2020-04-10T16:59:59.245+02:00"));
-            Assert.assertEquals(1,records.size());
+            Assert.assertEquals(1, records.size());
             Transaction publishedTransaction = objectMapper.readValue(records.get(0).value(), Transaction.class);
             Assert.assertEquals(sentTransaction, publishedTransaction);
             BDDMockito.verify(paymentInstrumentConnectorServiceSpy, Mockito.atLeastOnce())

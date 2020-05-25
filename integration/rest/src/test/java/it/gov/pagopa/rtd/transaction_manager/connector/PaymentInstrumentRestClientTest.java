@@ -1,75 +1,70 @@
 package it.gov.pagopa.rtd.transaction_manager.connector;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.gov.pagopa.bpd.common.connector.BaseFeignRestClientTest;
 import it.gov.pagopa.rtd.transaction_manager.connector.config.BpdPaymentInstrumentRestConnectorConfig;
+import lombok.SneakyThrows;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.Assert.assertEquals;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @TestPropertySource(
         locations = "classpath:config/rest-client.properties",
         properties = "spring.application.name=rtd-ms-transaction-manager-integration-rest")
-@Import({BpdPaymentInstrumentRestConnectorConfig.class})
+@ContextConfiguration(initializers = PaymentInstrumentRestClientTest.RandomPortInitializer.class,
+        classes = BpdPaymentInstrumentRestConnectorConfig.class)
 public class PaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
 
-    static {
-        SERIVICE_PORT_ENV_VAR_NAME = "BPD_PAYMENT_INSTRUMENT_PORT";
+    @ClassRule
+    public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig()
+            .dynamicPort()
+            .usingFilesUnderClasspath("stubs/payment-instrument")
+    );
+
+    @Test
+    public void checkActive() {
+        final String hashPan = "hashPan-active";
+        OffsetDateTime offsetDateTime = OffsetDateTime.parse("2020-04-10T14:59:59.245Z");
+
+        final boolean actualResponse = restClient.checkActive(hashPan, offsetDateTime);
+
+        assertTrue(actualResponse);
     }
 
-    @Autowired
-    private ObjectMapper objectMapper;
     @Autowired
     private PaymentInstrumentRestClient restClient;
 
     @Test
-    public void checkActive() throws IOException {
-
-        final String hashPan = "hashPan";
+    public void checkNotActive() {
+        final String hashPan = "hashPan-inactive";
         OffsetDateTime offsetDateTime = OffsetDateTime.parse("2020-04-10T14:59:59.245Z");
-        String encOffsetDateTime = URLEncoder.encode("2020-04-10T14:59:59.245Z", StandardCharsets.UTF_8.toString());
-
-        final boolean expectedResponse = true;
-        stubFor(get(urlEqualTo("/bpd/payment-instruments/"
-                + hashPan + "/history/active?accountingDate=" + encOffsetDateTime))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.OK.value())
-                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .withBody(objectMapper.writeValueAsString(expectedResponse))));
 
         final boolean actualResponse = restClient.checkActive(hashPan, offsetDateTime);
 
-        assertEquals(actualResponse, expectedResponse);
+        assertFalse(actualResponse);
     }
 
-    @Test
-    public void checkNotActive() throws IOException {
-
-        final String hashPan = "hashPan";
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse("2020-04-10T14:59:59.245Z");
-        String encOffsetDateTime = URLEncoder.encode("2020-04-10T14:59:59.245Z", StandardCharsets.UTF_8.toString());
-
-        final boolean expectedResponse = false;
-        stubFor(get(urlEqualTo("/bpd/payment-instruments/"
-                + hashPan + "/history/active?accountingDate=" + encOffsetDateTime))
-                .willReturn(aResponse()
-                        .withStatus(HttpStatus.OK.value())
-                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .withBody(objectMapper.writeValueAsString(expectedResponse))));
-
-        final boolean actualResponse = restClient.checkActive(hashPan, offsetDateTime);
-
-        assertEquals(actualResponse, expectedResponse);
+    public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+        @SneakyThrows
+        @Override
+        public void initialize(ConfigurableApplicationContext applicationContext) {
+            TestPropertySourceUtils
+                    .addInlinedPropertiesToEnvironment(applicationContext,
+                            String.format("rest-client.payment-instrument.base-url=http://%s:%d/bpd/payment-instruments",
+                                    wireMockRule.getOptions().bindAddress(),
+                                    wireMockRule.port())
+                    );
+        }
     }
 }

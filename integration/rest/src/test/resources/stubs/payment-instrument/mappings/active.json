@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/bpd/payment-instruments/hashPan-active/history/active",
+    "queryParameters": {
+      "accountingDate": {
+        "equalTo": "2020-04-10T14:59:59.245Z"
+      }
+    },
+    "headers": {
+      "x-request-id": {
+        "anything": true
+      }
+    }
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": "true",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

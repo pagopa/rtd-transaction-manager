@@ -1,7 +1,12 @@
 {
   "request": {
     "method": "GET",
-    "url": "?accountingDate=2020-04-11T14:59:59.245Z",
+    "urlPath": "/bpd/payment-instruments/hashPan-inactive/history/active",
+    "queryParameters": {
+      "accountingDate": {
+        "equalTo": "2020-04-10T14:59:59.245Z"
+      }
+    },
     "headers": {
       "x-request-id": {
         "anything": true

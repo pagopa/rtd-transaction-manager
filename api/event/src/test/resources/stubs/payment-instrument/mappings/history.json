@@ -1,0 +1,23 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/bpd/payment-instruments/test/history/active",
+    "queryParameters": {
+      "accountingDate": {
+        "equalTo": "2020-04-10T16:59:59.245+02:00"
+      }
+    },
+    "headers": {
+      "x-request-id": {
+        "anything": true
+      }
+    }
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": "true",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
