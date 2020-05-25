@@ -35,13 +35,13 @@ public class OnTransactionSaveRequestListenerValidationErrorIntegrationTest exte
                 .amount(BigDecimal.valueOf(1313.13))
                 .operationType("00")
                 .hpan("test")
-                .merchantId(0)
+                .merchantId("0")
                 .circuitType("00")
                 .mcc("815")
-                .idTrxIssuer(0)
+                .idTrxIssuer("0")
                 .amountCurrency("833")
-                .correlationId(1)
-                .acquirerId(0)
+                .correlationId("1")
+                .acquirerId("0")
                 .build();
     }
 
