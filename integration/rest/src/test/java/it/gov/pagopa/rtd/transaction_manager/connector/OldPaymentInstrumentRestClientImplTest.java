@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
  * test class for the REST client
  */
 
-@Import({PaymentInstrumentRestClientImpl.class, PaymentInstrumentRestConnector.class, ArchMedaInternalConnectorConfigurationService.class})
+@Import({OldPaymentInstrumentRestClientImpl.class, PaymentInstrumentRestConnector.class, ArchMedaInternalConnectorConfigurationService.class})
 @TestPropertySource(
         locations = {
                 "classpath:config/PaymentInstrumentRestConnector.properties"
@@ -25,15 +25,15 @@ import java.time.OffsetDateTime;
                 "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.randomMock=false",
                 "connectors.medaInternalConfigurations.items.PaymentInstrumentRestConnector.path=payment-instrument/test/history"
         })
-public class PaymentInstrumentRestClientImplTest extends BaseRestConnectorTest {
+public class OldPaymentInstrumentRestClientImplTest extends BaseRestConnectorTest {
 
     @Autowired
-    PaymentInstrumentRestClient paymentInstrumentRestClient;
+    OldPaymentInstrumentRestClient oldPaymentInstrumentRestClient;
 
     @Test
     public void checkActive() {
         try {
-            Boolean isActive = paymentInstrumentRestClient.checkActive(
+            Boolean isActive = oldPaymentInstrumentRestClient.checkActive(
                     "test", OffsetDateTime.parse("2020-04-10T14:59:59.245Z"));
             Assert.assertTrue(isActive);
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class PaymentInstrumentRestClientImplTest extends BaseRestConnectorTest {
     @Test
     public void checkNotActive() {
         try {
-            Boolean isActive = paymentInstrumentRestClient.checkActive(
+            Boolean isActive = oldPaymentInstrumentRestClient.checkActive(
                     "test", OffsetDateTime.parse("2020-04-11T14:59:59.245Z"));
             Assert.assertFalse(isActive);
         } catch (Exception e) {

@@ -20,7 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
+import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,6 +38,8 @@ import java.util.List;
  * inbound event listener, to the production of a message in the outbound channel
  */
 
+@AutoConfigureWireMock(stubs = "classpath:/mocks/payment-instrument/test/history")
+@EnableConfigurationProperties
 @ContextConfiguration(classes = {
         TestConfig.class,
         RestTemplateAutoConfiguration.class,
@@ -42,7 +47,8 @@ import java.util.List;
         ObjectPostProcessorConfiguration.class,
         AuthenticationConfiguration.class,
         KafkaAutoConfiguration.class,
-        ArchMedaInternalConnectorConfigurationService.class
+        ArchMedaInternalConnectorConfigurationService.class,
+        FeignAutoConfiguration.class
 })
 @TestPropertySource(
         locations = {

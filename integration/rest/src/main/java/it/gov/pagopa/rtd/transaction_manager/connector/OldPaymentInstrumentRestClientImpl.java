@@ -10,21 +10,21 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 
 /**
- * Implementation of the PaymentInstrumentRestClient interface, the class contains the logic for the creation
+ * Implementation of the OldPaymentInstrumentRestClient interface, the class contains the logic for the creation
  * of the query to pass at the connector call
  */
 
 @Service
-class PaymentInstrumentRestClientImpl extends BaseService implements PaymentInstrumentRestClient{
+class OldPaymentInstrumentRestClientImpl extends BaseService implements OldPaymentInstrumentRestClient {
 
     private final PaymentInstrumentRestConnector connector;
     private final SimpleRestGetRequestTransformer requestTransformer;
     private final SimpleRest2xxResponseTransformer<Boolean> responseTransformer;
 
     @Autowired
-    public PaymentInstrumentRestClientImpl(PaymentInstrumentRestConnector connector,
-                                SimpleRestGetRequestTransformer requestTransformer,
-                                SimpleRest2xxResponseTransformer<Boolean> responseTransformer) {
+    public OldPaymentInstrumentRestClientImpl(PaymentInstrumentRestConnector connector,
+                                              SimpleRestGetRequestTransformer requestTransformer,
+                                              SimpleRest2xxResponseTransformer<Boolean> responseTransformer) {
         this.connector = connector;
         this.requestTransformer = requestTransformer;
         this.responseTransformer = responseTransformer;
