@@ -27,12 +27,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>eu.sia.meda</groupId>
-            <artifactId>meda-arch-rest</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 </project>
