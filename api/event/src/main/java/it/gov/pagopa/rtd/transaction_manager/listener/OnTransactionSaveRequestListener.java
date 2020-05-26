@@ -1,5 +1,6 @@
 package it.gov.pagopa.rtd.transaction_manager.listener;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.sia.meda.eventlistener.BaseEventListener;
 import it.gov.pagopa.rtd.transaction_manager.command.SaveTransactionCommand;
 import it.gov.pagopa.rtd.transaction_manager.factory.ModelFactory;
@@ -27,15 +28,18 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
     private final TransactionManagerErrorPublisherService transactionManagerErrorPublisherService;
     private final ModelFactory<Pair<byte[], Headers>, SaveTransactionCommandModel> saveTransactionCommandModelFactory;
     private final BeanFactory beanFactory;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public OnTransactionSaveRequestListener(
             TransactionManagerErrorPublisherService transactionManagerErrorPublisherService,
             ModelFactory<Pair<byte[], Headers>,SaveTransactionCommandModel> saveTransactionCommandModelFactory,
-            BeanFactory beanFactory) {
+            BeanFactory beanFactory,
+            ObjectMapper objectMapper) {
         this.transactionManagerErrorPublisherService = transactionManagerErrorPublisherService;
         this.saveTransactionCommandModelFactory = saveTransactionCommandModelFactory;
         this.beanFactory = beanFactory;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -53,14 +57,16 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
     @Override
     public void onReceived(byte[] payload, Headers headers) {
 
+        SaveTransactionCommandModel saveTransactionCommandModel = null;
+
         try {
 
             if (log.isDebugEnabled()) {
                 log.debug("Processing new request on inbound queue");
             }
 
-            SaveTransactionCommandModel saveTransactionCommandModel =
-                    saveTransactionCommandModelFactory.createModel(Pair.of(payload, headers));
+            saveTransactionCommandModel = saveTransactionCommandModelFactory
+                    .createModel(Pair.of(payload, headers));
             SaveTransactionCommand command = beanFactory.getBean(
                     SaveTransactionCommand.class, saveTransactionCommandModel);
 
@@ -73,24 +79,37 @@ public class OnTransactionSaveRequestListener extends BaseEventListener {
             }
 
         } catch (Exception e) {
-            //TODO: Gestione casi d'errori per acknowledgment
+
             String payloadString = "null";
-            if (payload != null) {
-                try {
-                    payloadString = new String(payload, StandardCharsets.UTF_8);
-                } catch (Exception e2) {
+            String error = "Unexpected error during transaction processing";
+
+            try {
+                payloadString = new String(payload, StandardCharsets.UTF_8);
+            } catch (Exception e2) {
+                if (logger.isErrorEnabled()) {
                     logger.error("Something gone wrong converting the payload into String", e2);
                 }
-                logger.error(String.format(
-                        "Something gone wrong during the evaluation of the payload:%n%s", payloadString), e);
             }
-            if (!transactionManagerErrorPublisherService.publishErrorEvent(payload, headers,
-                    "Unexpected error during transaction processing")) {
+
+            if (saveTransactionCommandModel != null && saveTransactionCommandModel.getPayload() != null) {
+                payloadString = new String(payload, StandardCharsets.UTF_8);
+                error = String.format("Unexpected error during transaction processing: %s, %s",
+                        payloadString, e.getMessage());
+            } else if (payload != null) {
+                error = String.format("Something gone wrong during the evaluation of the payload: %s, %s",
+                        payloadString, e.getMessage());
+                if (logger.isErrorEnabled()) {
+                    logger.error(error, e);
+                }
+            }
+
+            if (!transactionManagerErrorPublisherService.publishErrorEvent(payload, headers, error)) {
                 if (log.isErrorEnabled()) {
                     log.error("Could not publish transaction processing error");
                 }
+                throw e;
             }
-            throw e;
+
         }
     }
 

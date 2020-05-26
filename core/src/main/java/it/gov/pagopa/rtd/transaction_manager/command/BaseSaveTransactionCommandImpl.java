@@ -1,14 +1,11 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.sia.meda.core.command.BaseCommand;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
-import it.gov.pagopa.rtd.transaction_manager.service.TransactionManagerErrorPublisherService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +31,6 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
     private PaymentInstrumentConnectorService paymentInstrumentConnectorService;
     private PointTransactionPublisherService pointTransactionProducerService;
     private InvoiceTransactionPublisherService invoiceTransactionProducerService;
-    private TransactionManagerErrorPublisherService transactionManagerErrorPublisherService;
-    private ObjectMapper objectMapper;
 
     public BaseSaveTransactionCommandImpl(SaveTransactionCommandModel saveTransactionCommandModel) {
         this.saveTransactionCommandModel = saveTransactionCommandModel;
@@ -45,15 +40,11 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             SaveTransactionCommandModel saveTransactionCommandModel,
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
-            InvoiceTransactionPublisherService invoiceTransactionProducerService,
-            TransactionManagerErrorPublisherService transactionManagerErrorPublisherService,
-            ObjectMapper objectMapper) {
+            InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         this.saveTransactionCommandModel = saveTransactionCommandModel;
         this.paymentInstrumentConnectorService = paymentInstrumentConnectorService;
         this.pointTransactionProducerService = pointTransactionProducerService;
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
-        this.transactionManagerErrorPublisherService = transactionManagerErrorPublisherService;
-        this.objectMapper = objectMapper;
     }
 
     /**
@@ -103,19 +94,9 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                             transaction.getIdTrxAcquirer() + ", " +
                             transaction.getAcquirerCode() + ", " +
                             transaction.getTrxDate());
-                }
-                try {
-                    transactionManagerErrorPublisherService.publishErrorEvent(
-                            objectMapper.writeValueAsBytes(transaction),
-                            saveTransactionCommandModel.getHeaders(),
-                            "Error occured during processing for transaction:" + e.getMessage());
-                } catch (JsonProcessingException ex) {
-                    if (logger.isErrorEnabled()) {
-                        logger.error(e.getMessage(), e);
-                    }
+                    logger.error(e.getMessage(), e);
                 }
 
-                return false;
             }
 
             throw e;
@@ -140,18 +121,6 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
     public void setInvoiceTransactionProducerService(
             InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
-    }
-
-    @Autowired
-    public void setTransactionManagerErrorPublisherService(
-            TransactionManagerErrorPublisherService transactionManagerErrorPublisherService) {
-        this.transactionManagerErrorPublisherService = transactionManagerErrorPublisherService;
-    }
-
-    @Autowired
-    public void setObjectMapper(
-            ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
     }
 
     /**
