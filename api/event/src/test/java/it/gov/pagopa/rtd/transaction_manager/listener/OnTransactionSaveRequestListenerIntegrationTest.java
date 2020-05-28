@@ -2,7 +2,6 @@ package it.gov.pagopa.rtd.transaction_manager.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
-import eu.sia.meda.connector.meda.ArchMedaInternalConnectorConfigurationService;
 import eu.sia.meda.event.service.ErrorPublisherService;
 import eu.sia.meda.eventlistener.BaseEventListenerIntegrationTest;
 import it.gov.pagopa.rtd.transaction_manager.factory.SaveTransactionCommandModelFactory;
@@ -54,7 +53,6 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
                 ObjectPostProcessorConfiguration.class,
                 AuthenticationConfiguration.class,
                 KafkaAutoConfiguration.class,
-                ArchMedaInternalConnectorConfigurationService.class,
                 FeignAutoConfiguration.class
         })
 @TestPropertySource(
