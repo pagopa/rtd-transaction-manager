@@ -134,6 +134,8 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
                 .amountCurrency("833")
                 .correlationId("1")
                 .acquirerId("0")
+                .terminalId("2")
+                .bic("000001")
                 .build();
     }
 

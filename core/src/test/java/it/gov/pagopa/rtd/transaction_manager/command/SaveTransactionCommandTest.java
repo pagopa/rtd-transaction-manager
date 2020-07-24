@@ -210,6 +210,8 @@ public class SaveTransactionCommandTest extends BaseTest {
                 .amountCurrency("833")
                 .correlationId("1")
                 .acquirerId("0")
+                .terminalId("0")
+                .bic("000004")
                 .build();
     }
 

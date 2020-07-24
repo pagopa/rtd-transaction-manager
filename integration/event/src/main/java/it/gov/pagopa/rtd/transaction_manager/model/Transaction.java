@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -20,7 +21,8 @@ import java.time.OffsetDateTime;
 @EqualsAndHashCode(of = {"idTrxAcquirer", "acquirerCode", "trxDate"}, callSuper = false)
 public class Transaction {
 
-    @NotNull @NotBlank
+    @NotNull
+    @NotBlank
     String idTrxAcquirer;
 
     @NotNull
@@ -32,29 +34,49 @@ public class Transaction {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     OffsetDateTime trxDate;
 
+    @NotNull
+    @NotBlank
     @Size(max = 64)
     String hpan;
 
-    @Size(max = 5)
+    @NotNull
+    @NotBlank
+    @Pattern(regexp = "[0-9]{2}")
     String operationType;
 
-    @Size(max = 5)
+    @NotNull
+    @NotBlank
+    @Pattern(regexp = "[0-9]{2}")
     String circuitType;
 
+    @NotNull
     String idTrxIssuer;
 
     String correlationId;
 
+    @NotNull
     BigDecimal amount;
 
     @Size(max = 3)
     String amountCurrency;
 
+    @NotNull
+    @NotBlank
     @Size(max = 5)
     String mcc;
 
     String acquirerId;
 
+    @NotNull
+    @NotBlank
     String merchantId;
+
+    @NotNull
+    @NotBlank
+    String terminalId;
+
+    @NotNull
+    @Pattern(regexp = "([0-9]{6}|[0-9]{8})")
+    String bic;
 
 }

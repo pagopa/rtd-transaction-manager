@@ -80,6 +80,8 @@ public class OnTransactionSaveRequestListenerTest extends BaseEventListenerTest 
                 .amountCurrency("833")
                 .correlationId("1")
                 .acquirerId("0")
+                .terminalId("0")
+                .bic("000005")
                 .build();
     }
 
