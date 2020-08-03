@@ -96,7 +96,7 @@ stages:
         displayName: Deploy
         pool:
           vmImage: $(vmImageName)
-        environment: 'rtdtransactionmanager.rtd-test'
+        environment: 'pagopartdtransactionmanager.rtd-test'
         strategy:
           runOnce:
             deploy:
