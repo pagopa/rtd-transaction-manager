@@ -28,7 +28,7 @@ variables:
   containerRegistry: 'cstarregistry.azurecr.io'
   dockerfileRelativePath: 'Dockerfile'
   tag: '$(Build.BuildId)'
-  imagePullSecret: 'cstarregistry92872b72-auth'
+  imagePullSecret: 'cstarregistry-auth'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -56,11 +56,11 @@ stages:
             inputs:
               mavenPomFile: 'pom.xml'
               goals: 'deploy'
-              options: '-B -s $(settingsxml.secureFilePath) -Dmaven.test.skip=true'
-              #              publishJUnitResults: true
-              #              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              #              codeCoverageToolOption: 'JaCoCo'
-              #              codeCoverageClassFilter: '+:it.gov.pagopa.**,-:**.*Config,-:**.model.**,-:**.enums.**,-:**.*Constants,-:**.*Application,-:**.*Test,-:**.*Test.**'
+              options: '-B -s $(settingsxml.secureFilePath)'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              codeCoverageToolOption: 'JaCoCo'
+              codeCoverageClassFilter: '+:it.gov.pagopa.**,-:**.*Config,-:**.model.**,-:**.enums.**,-:**.*Constants,-:**.*Application,-:**.*Test,-:**.*Test.**'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.8'
               mavenVersionOption: 'Default'
@@ -85,3 +85,37 @@ stages:
               targetPath: '$(Build.Repository.LocalPath)/manifests'
               artifact: 'manifests'
               publishLocation: 'pipeline'
+
+  - stage: Deploy
+    displayName: Deploy stage
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables.isToDeploy, true))
+
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy
+        pool:
+          vmImage: $(vmImageName)
+        environment: 'rtdtransactionmanager.rtd-test'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+                - task: DownloadPipelineArtifact@2
+                  inputs:
+                    buildType: 'current'
+                    artifactName: 'manifests'
+                    targetPath: '$(Pipeline.Workspace)/manifests'
+                - task: KubernetesManifest@0
+                  displayName: Deploy to Kubernetes cluster
+                  inputs:
+                    action: deploy
+                    manifests: |
+                      $(Pipeline.Workspace)/manifests/deployment.yml
+                      $(Pipeline.Workspace)/manifests/service.yml
+                    imagePullSecrets: |
+                      $(imagePullSecret)
+                    containers: |
+                      $(containerRegistry)/$(imageRepository):$(tag)
+
