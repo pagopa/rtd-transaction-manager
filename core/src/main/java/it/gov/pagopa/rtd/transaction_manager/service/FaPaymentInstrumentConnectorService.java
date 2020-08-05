@@ -1,21 +1,21 @@
 package it.gov.pagopa.rtd.transaction_manager.service;
 
-import java.time.OffsetDateTime;
+import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 
 /**
  * public interface for the PaymentInstrumentConnectorService
  */
 
-public interface PaymentInstrumentConnectorService {
+public interface FaPaymentInstrumentConnectorService {
 
     /**
      * Method that has the logic for recovering the status for a given instrument on the given date,
      * calling on the appropriate REST connector
-     * @param hpan
-     *          hpan of the instrument to check
+     *
+     * @param hpan hpan of the instrument to check
      */
 
-    public Boolean checkActive(String hpan, OffsetDateTime accountingDate) throws Exception;
+    public PaymentInstrumentResource find(String hpan);
 
 
 }

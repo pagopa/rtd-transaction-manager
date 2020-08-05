@@ -1,8 +1,10 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import eu.sia.meda.core.command.BaseCommand;
+import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
+import it.gov.pagopa.rtd.transaction_manager.service.FaPaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
@@ -29,6 +31,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
     private SaveTransactionCommandModel saveTransactionCommandModel;
     private PaymentInstrumentConnectorService paymentInstrumentConnectorService;
+    private FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService;
     private PointTransactionPublisherService pointTransactionProducerService;
     private InvoiceTransactionPublisherService invoiceTransactionProducerService;
 
@@ -39,10 +42,12 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
     public BaseSaveTransactionCommandImpl(
             SaveTransactionCommandModel saveTransactionCommandModel,
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
+            FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
             InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         this.saveTransactionCommandModel = saveTransactionCommandModel;
         this.paymentInstrumentConnectorService = paymentInstrumentConnectorService;
+        this.faPaymentInstrumentConnectorService = faPaymentInstrumentConnectorService;
         this.pointTransactionProducerService = pointTransactionProducerService;
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
     }
@@ -72,7 +77,6 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             validateRequest(transaction);
 
             if (paymentInstrumentConnectorService.checkActive(transaction.getHpan(), transaction.getTrxDate())) {
-                //TODO: Distinzione fra BPD ed FA
                 if (log.isDebugEnabled()) {
                     log.debug("Publishing valid transaction");
                 }
@@ -80,6 +84,20 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             } else {
                 if (log.isInfoEnabled()) {
                     log.info("Met a transaction for an unactive payment instrument. Discarding.");
+                }
+            }
+
+            if (faPaymentInstrumentConnectorService.find(transaction.getHpan()) != null) {
+                PaymentInstrumentResource resource = faPaymentInstrumentConnectorService.find(transaction.getHpan());
+                if (resource.getStatus() == PaymentInstrumentResource.Status.ACTIVE) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("publishing valid transaction");
+                    }
+                    invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
+                } else {
+                    if (log.isInfoEnabled()) {
+                        log.info("Met a transaction for an unactive payment instrument. Discarding.");
+                    }
                 }
             }
 

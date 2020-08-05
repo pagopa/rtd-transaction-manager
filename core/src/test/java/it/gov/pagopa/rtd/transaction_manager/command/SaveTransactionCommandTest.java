@@ -1,8 +1,10 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import it.gov.pagopa.bpd.common.BaseTest;
+import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
+import it.gov.pagopa.rtd.transaction_manager.service.FaPaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
@@ -28,6 +30,8 @@ public class SaveTransactionCommandTest extends BaseTest {
     @Mock
     PaymentInstrumentConnectorService paymentInstrumentConnectorServiceMock;
     @Mock
+    FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorServiceMock;
+    @Mock
     PointTransactionPublisherService pointTransactionProducerServiceMock;
     @Mock
     InvoiceTransactionPublisherService invoiceTransactionProducerServiceMock;
@@ -39,6 +43,7 @@ public class SaveTransactionCommandTest extends BaseTest {
     public void initTest() {
 
         Mockito.reset(
+                faPaymentInstrumentConnectorServiceMock,
                 paymentInstrumentConnectorServiceMock,
                 pointTransactionProducerServiceMock,
                 invoiceTransactionProducerServiceMock);
@@ -93,6 +98,54 @@ public class SaveTransactionCommandTest extends BaseTest {
             BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
                     .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
             BDDMockito.verifyZeroInteractions(pointTransactionProducerServiceMock);
+            BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
+    }
+
+    @Test
+    public void test_Fa_Active() {
+
+        Transaction transaction = getRequestObject();
+        SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
+        PaymentInstrumentResource resource = new PaymentInstrumentResource();
+        resource.setStatus(PaymentInstrumentResource.Status.ACTIVE);
+
+        try {
+
+            BDDMockito.doReturn(resource).when(faPaymentInstrumentConnectorServiceMock)
+                    .find(Mockito.eq(transaction.getHpan()));
+
+            Boolean isOk = saveTransactionCommand.execute();
+
+            Assert.assertTrue(isOk);
+            BDDMockito.verify(faPaymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
+                    .find(Mockito.eq(transaction.getHpan()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+
+    }
+
+    @Test
+    public void test_Fa_NotActive() {
+
+        Transaction transaction = getRequestObject();
+        SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
+        PaymentInstrumentResource resource = new PaymentInstrumentResource();
+        resource.setStatus(PaymentInstrumentResource.Status.INACTIVE);
+
+        try {
+
+            BDDMockito.doReturn(resource).when(faPaymentInstrumentConnectorServiceMock)
+                    .find(Mockito.eq(transaction.getHpan()));
+
             BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
 
         } catch (Exception e) {
@@ -187,12 +240,14 @@ public class SaveTransactionCommandTest extends BaseTest {
     }
 
     protected SaveTransactionCommand buildCommandInstance(Transaction transaction) {
-        return new SaveTransactionCommandImpl(
-                SaveTransactionCommandModel.builder().payload(transaction).headers(null).build(),
-                paymentInstrumentConnectorServiceMock,
-                pointTransactionProducerServiceMock,
-                invoiceTransactionProducerServiceMock
-        );
+        return
+                new SaveTransactionCommandImpl(
+                        SaveTransactionCommandModel.builder().payload(transaction).headers(null).build(),
+                        paymentInstrumentConnectorServiceMock,
+                        faPaymentInstrumentConnectorServiceMock,
+                        pointTransactionProducerServiceMock,
+                        invoiceTransactionProducerServiceMock
+                );
     }
 
     protected Transaction getRequestObject() {

@@ -85,9 +85,20 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
                             String.format("rest-client.payment-instrument.base-url=http://%s:%d/bpd/payment-instruments",
                                     wireMockRule.getOptions().bindAddress(),
                                     wireMockRule.port())
+
+                    );
+
+            TestPropertySourceUtils
+                    .addInlinedPropertiesToEnvironment(applicationContext,
+                            String.format("rest-client.fa-payment-instrument.base-url=http://%s:%d/fa/payment-instruments",
+                                    wireMockRule.getOptions().bindAddress(),
+                                    wireMockRule.port())
+
                     );
 
         }
+
+
     }
 
     @Value("${listeners.eventConfigurations.items.OnTransactionSaveRequestListener.topic}")

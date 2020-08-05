@@ -82,4 +82,5 @@ public class PaymentInstrumentConnectorServiceTest extends BaseTest {
         BDDMockito.verify(paymentInstrumentRestClient, Mockito.atLeastOnce()).checkActive(
                 Mockito.eq("notactivepan"), Mockito.eq(accountingDate));
     }
+
 }

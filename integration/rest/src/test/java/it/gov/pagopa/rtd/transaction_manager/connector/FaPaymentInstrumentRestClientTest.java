@@ -1,8 +1,10 @@
 package it.gov.pagopa.rtd.transaction_manager.connector;
 
+import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.gov.pagopa.bpd.common.connector.BaseFeignRestClientTest;
-import it.gov.pagopa.rtd.transaction_manager.connector.config.BpdPaymentInstrumentRestConnectorConfig;
+import it.gov.pagopa.rtd.transaction_manager.connector.config.FaPaymentInstrumentRestConnectorConfig;
+import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import lombok.SneakyThrows;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -13,47 +15,35 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.support.TestPropertySourceUtils;
 
-import java.time.OffsetDateTime;
-
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static junit.framework.TestCase.assertNotNull;
 
 @TestPropertySource(
-        locations = "classpath:config/bpd/rest-client.properties",
+        locations = "classpath:config/fa/rest-client.properties",
         properties = "spring.application.name=rtd-ms-transaction-manager-integration-rest")
-@ContextConfiguration(initializers = PaymentInstrumentRestClientTest.RandomPortInitializer.class,
-        classes = BpdPaymentInstrumentRestConnectorConfig.class)
-public class PaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
+@ContextConfiguration(initializers = FaPaymentInstrumentRestClientTest.RandomPortInitializer.class,
+        classes = FaPaymentInstrumentRestConnectorConfig.class)
+public class FaPaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
 
     @ClassRule
     public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig()
             .dynamicPort()
             .usingFilesUnderClasspath("stubs/payment-instrument")
+            .extensions(new ResponseTemplateTransformer(false))
     );
-
-    @Test
-    public void checkActive() {
-        final String hashPan = "hashPan-active";
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse("2020-04-10T14:59:59.245Z");
-
-        final boolean actualResponse = restClient.checkActive(hashPan, offsetDateTime);
-
-        assertTrue(actualResponse);
-    }
-
     @Autowired
-    private PaymentInstrumentRestClient restClient;
+    private FaPaymentInstrumentRestClient restClient;
+
 
     @Test
-    public void checkNotActive() {
-        final String hashPan = "hashPan-inactive";
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse("2020-04-10T14:59:59.245Z");
+    public void find() {
+        final String hpan = "hpan";
 
-        final boolean actualResponse = restClient.checkActive(hashPan, offsetDateTime);
+        final PaymentInstrumentResource actualResponse = restClient.find(hpan);
 
-        assertFalse(actualResponse);
+        assertNotNull(actualResponse);
     }
+
 
     public static class RandomPortInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @SneakyThrows
@@ -61,7 +51,7 @@ public class PaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
         public void initialize(ConfigurableApplicationContext applicationContext) {
             TestPropertySourceUtils
                     .addInlinedPropertiesToEnvironment(applicationContext,
-                            String.format("rest-client.payment-instrument.base-url=http://%s:%d/bpd/payment-instruments",
+                            String.format("rest-client.fa-payment-instrument.base-url=http://%s:%d/fa/payment-instruments",
                                     wireMockRule.getOptions().bindAddress(),
                                     wireMockRule.port())
                     );

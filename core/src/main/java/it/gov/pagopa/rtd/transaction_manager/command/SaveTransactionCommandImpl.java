@@ -1,6 +1,7 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
+import it.gov.pagopa.rtd.transaction_manager.service.FaPaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
 import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
 import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
@@ -27,12 +28,14 @@ class SaveTransactionCommandImpl extends BaseSaveTransactionCommandImpl implemen
     public SaveTransactionCommandImpl(
             SaveTransactionCommandModel saveTransactionCommandModel,
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
+            FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
             InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         super(saveTransactionCommandModel,
-              paymentInstrumentConnectorService,
-              pointTransactionProducerService,
-              invoiceTransactionProducerService);
+                paymentInstrumentConnectorService,
+                faPaymentInstrumentConnectorService,
+                pointTransactionProducerService,
+                invoiceTransactionProducerService);
     }
 
     @Override
