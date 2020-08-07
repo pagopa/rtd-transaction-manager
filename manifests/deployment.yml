@@ -16,15 +16,13 @@ spec:
             - containerPort: 8080
           envFrom:
             - secretRef:
-                name: postgres-credentials
-            - secretRef:
-                name: azure-storage
-            - secretRef:
                 name: rtdtransactionmanager
             - configMapRef:
                 name: eventhub-logging
             - configMapRef:
-                name: rtdtransactionmanager
+                name: eventhub-common
+            - configMapRef:
+                name: rest-client
       hostAliases:
         - hostnames:
             - bpd-hub-dev.servicebus.windows.net
