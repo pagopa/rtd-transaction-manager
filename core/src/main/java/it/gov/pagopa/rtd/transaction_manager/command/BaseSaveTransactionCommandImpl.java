@@ -124,6 +124,12 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
     }
 
     @Autowired
+    public void setFaPaymentInstrumentConnectorService(
+            FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService) {
+        this.faPaymentInstrumentConnectorService = faPaymentInstrumentConnectorService;
+    }
+
+    @Autowired
     public void setPaymentInstrumentConnectorService(
             PaymentInstrumentConnectorService paymentInstrumentConnectorService) {
         this.paymentInstrumentConnectorService = paymentInstrumentConnectorService;
