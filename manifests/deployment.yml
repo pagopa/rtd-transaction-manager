@@ -18,6 +18,8 @@ spec:
             - secretRef:
                 name: rtdtransactionmanager
             - configMapRef:
+                name: rtdtransactionmanager
+            - configMapRef:
                 name: eventhub-logging
             - configMapRef:
                 name: eventhub-common
