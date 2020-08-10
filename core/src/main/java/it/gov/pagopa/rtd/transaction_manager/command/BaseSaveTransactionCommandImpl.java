@@ -78,25 +78,31 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
             if (paymentInstrumentConnectorService.checkActive(transaction.getHpan(), transaction.getTrxDate())) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Publishing valid transaction");
+                    log.debug("Publishing valid transaction on BPD: " +
+                            transaction.getIdTrxAcquirer() + ", " +
+                            transaction.getAcquirerCode() + ", " +
+                            transaction.getTrxDate());
                 }
                 pointTransactionProducerService.publishPointTransactionEvent(transaction);
             } else {
                 if (log.isInfoEnabled()) {
-                    log.info("Met a transaction for an unactive payment instrument. Discarding.");
+                    log.info("Met a transaction for an inactive payment instrument on BPD.");
                 }
             }
 
-            if (faPaymentInstrumentConnectorService.find(transaction.getHpan()) != null) {
-                PaymentInstrumentResource resource = faPaymentInstrumentConnectorService.find(transaction.getHpan());
+            PaymentInstrumentResource resource = faPaymentInstrumentConnectorService.find(transaction.getHpan());
+            if (resource != null) {
                 if (resource.getStatus() == PaymentInstrumentResource.Status.ACTIVE) {
                     if (log.isDebugEnabled()) {
-                        log.debug("publishing valid transaction");
+                        log.debug("publishing valid transaction on FA: " +
+                                transaction.getIdTrxAcquirer() + ", " +
+                                transaction.getAcquirerCode() + ", " +
+                                transaction.getTrxDate());
                     }
                     invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
                 } else {
                     if (log.isInfoEnabled()) {
-                        log.info("Met a transaction for an unactive payment instrument. Discarding.");
+                        log.info("Met a transaction for an inactive payment instrument on FA.");
                     }
                 }
             }
