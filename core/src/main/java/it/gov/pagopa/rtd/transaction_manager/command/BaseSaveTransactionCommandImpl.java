@@ -92,7 +92,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
             PaymentInstrumentResource resource = faPaymentInstrumentConnectorService.find(transaction.getHpan());
             if (resource != null) {
-                if (resource.getStatus().toString().equals(PaymentInstrumentResource.Status.ACTIVE.toString())) {
+                if ("ACTIVE".equals(resource.getStatus())) {
                     if (log.isDebugEnabled()) {
                         log.debug("publishing valid transaction on FA: " +
                                 transaction.getIdTrxAcquirer() + ", " +

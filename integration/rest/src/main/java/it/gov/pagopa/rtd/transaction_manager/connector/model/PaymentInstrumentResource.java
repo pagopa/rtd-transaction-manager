@@ -5,10 +5,6 @@ import lombok.Data;
 @Data
 public class PaymentInstrumentResource {
 
-    private Status Status;
-
-    public enum Status {
-        ACTIVE, INACTIVE
-    }
+    private String status;
 
 }

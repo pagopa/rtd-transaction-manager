@@ -113,7 +113,7 @@ public class SaveTransactionCommandTest extends BaseTest {
         Transaction transaction = getRequestObject();
         SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
         PaymentInstrumentResource resource = new PaymentInstrumentResource();
-        resource.setStatus(PaymentInstrumentResource.Status.ACTIVE);
+        resource.setStatus("ACTIVE");
 
         try {
 
@@ -139,7 +139,7 @@ public class SaveTransactionCommandTest extends BaseTest {
         Transaction transaction = getRequestObject();
         SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
         PaymentInstrumentResource resource = new PaymentInstrumentResource();
-        resource.setStatus(PaymentInstrumentResource.Status.INACTIVE);
+        resource.setStatus("INACTIVE");
 
         try {
 

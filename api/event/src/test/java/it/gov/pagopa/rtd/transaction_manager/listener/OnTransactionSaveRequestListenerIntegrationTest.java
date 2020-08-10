@@ -174,7 +174,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
                     .checkActive(Mockito.eq(sentTransaction.getHpan()),
                             Mockito.eq(sentTransaction.getTrxDate()));
             BDDMockito.verify(pointTransactionPublisherServiceSpy).publishPointTransactionEvent(Mockito.any());
-            BDDMockito.verifyZeroInteractions(invoiceTransactionPublisherServiceSpy);
+            BDDMockito.verify(invoiceTransactionPublisherServiceSpy).publishInvoiceTransactionEvent(Mockito.any());
 
         } catch (Exception e) {
             e.printStackTrace();

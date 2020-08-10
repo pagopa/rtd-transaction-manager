@@ -40,7 +40,7 @@ public class FaPaymentInstrumentConnectorServiceTest extends BaseTest {
     @Test
     public void checkStatus() {
         PaymentInstrumentResource paymentInstrument = new PaymentInstrumentResource();
-        paymentInstrument.setStatus(PaymentInstrumentResource.Status.ACTIVE);
+        paymentInstrument.setStatus("ACTIVE");
 
         BDDMockito.doReturn(paymentInstrument).when(faPaymentInstrumentRestClient)
                 .find(Mockito.eq("activepan"));
@@ -58,7 +58,7 @@ public class FaPaymentInstrumentConnectorServiceTest extends BaseTest {
     @Test
     public void checkStatus_ko() {
         PaymentInstrumentResource paymentInstrument = new PaymentInstrumentResource();
-        paymentInstrument.setStatus(PaymentInstrumentResource.Status.INACTIVE);
+        paymentInstrument.setStatus("INACTIVE");
 
         BDDMockito.doReturn(null).when(faPaymentInstrumentRestClient)
                 .find(Mockito.eq("notactivepan"));
