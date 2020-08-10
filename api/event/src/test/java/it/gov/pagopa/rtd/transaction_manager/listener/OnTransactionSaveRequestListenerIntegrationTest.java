@@ -146,7 +146,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
                 .correlationId("1")
                 .acquirerId("0")
                 .terminalId("2")
-                .bic("000001")
+                .bin("000001")
                 .build();
     }
 

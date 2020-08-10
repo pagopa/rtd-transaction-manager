@@ -266,7 +266,7 @@ public class SaveTransactionCommandTest extends BaseTest {
                 .correlationId("1")
                 .acquirerId("0")
                 .terminalId("0")
-                .bic("000004")
+                .bin("000004")
                 .build();
     }
 

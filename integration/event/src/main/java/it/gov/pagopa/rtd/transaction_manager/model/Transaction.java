@@ -77,6 +77,6 @@ public class Transaction {
 
     @NotNull
     @Pattern(regexp = "([0-9]{6}|[0-9]{8})")
-    String bic;
+    String bin;
 
 }

@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
@@ -13,6 +14,9 @@ import java.util.List;
  * inbound event listener, to the production of a message in the outbound error channel
  */
 
+@TestPropertySource(properties = {
+        "connectors.eventConfigurations.items.TransactionManagerErrorPublisherConnector.topic=rtd-trx-valid-error-test"
+})
 public class OnTransactionSaveRequestListenerInvalidPayloadErrorIntegrationTest extends OnTransactionSaveRequestListenerIntegrationTest {
 
     @Value("${connectors.eventConfigurations.items.TransactionManagerErrorPublisherConnector.topic}")
