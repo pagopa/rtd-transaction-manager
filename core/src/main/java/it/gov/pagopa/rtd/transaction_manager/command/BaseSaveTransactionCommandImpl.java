@@ -1,13 +1,11 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import eu.sia.meda.core.command.BaseCommand;
+import it.gov.pagopa.rtd.transaction_manager.connector.model.MerchantResource;
 import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
-import it.gov.pagopa.rtd.transaction_manager.service.FaPaymentInstrumentConnectorService;
-import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
-import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
-import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
+import it.gov.pagopa.rtd.transaction_manager.service.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
     private SaveTransactionCommandModel saveTransactionCommandModel;
     private PaymentInstrumentConnectorService paymentInstrumentConnectorService;
     private FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService;
+    private FaMerchantConnectorService faMerchantConnectorService;
     private PointTransactionPublisherService pointTransactionProducerService;
     private InvoiceTransactionPublisherService invoiceTransactionProducerService;
 
@@ -44,12 +43,14 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
             FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
-            InvoiceTransactionPublisherService invoiceTransactionProducerService) {
+            InvoiceTransactionPublisherService invoiceTransactionProducerService,
+            FaMerchantConnectorService faMerchantConnectorService) {
         this.saveTransactionCommandModel = saveTransactionCommandModel;
         this.paymentInstrumentConnectorService = paymentInstrumentConnectorService;
         this.faPaymentInstrumentConnectorService = faPaymentInstrumentConnectorService;
         this.pointTransactionProducerService = pointTransactionProducerService;
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
+        this.faMerchantConnectorService = faMerchantConnectorService;
     }
 
     /**
@@ -90,9 +91,18 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                 }
             }
 
-            PaymentInstrumentResource resource = faPaymentInstrumentConnectorService.find(transaction.getHpan());
-            if (resource != null) {
-                if ("ACTIVE".equals(resource.getStatus())) {
+            PaymentInstrumentResource paymentInstrumentResource =
+                    faPaymentInstrumentConnectorService.find(transaction.getHpan());
+            if (paymentInstrumentResource != null) {
+                MerchantResource merchantResource = faMerchantConnectorService.findMerchant(transaction.getMerchantId());
+
+                if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
+                    (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
+                    (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
+                           .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0) &&
+                    (merchantResource != null && merchantResource.getTimestampTC()
+                            .compareTo(transaction.getTrxDate()) <= 0)
+                ) {
                     if (log.isDebugEnabled()) {
                         log.debug("publishing valid transaction on FA: " +
                                 transaction.getIdTrxAcquirer() + ", " +
@@ -105,6 +115,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                         log.info("Met a transaction for an inactive payment instrument on FA.");
                     }
                 }
+
             }
 
             return true;
@@ -127,6 +138,12 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
         }
 
+    }
+
+    @Autowired
+    public void setFaMerchantConnectorService(
+            FaMerchantConnectorService faMerchantConnectorService) {
+        this.faMerchantConnectorService = faMerchantConnectorService;
     }
 
     @Autowired

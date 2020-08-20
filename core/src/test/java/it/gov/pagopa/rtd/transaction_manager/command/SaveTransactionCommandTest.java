@@ -1,13 +1,11 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import it.gov.pagopa.bpd.common.BaseTest;
+import it.gov.pagopa.rtd.transaction_manager.connector.model.MerchantResource;
 import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
-import it.gov.pagopa.rtd.transaction_manager.service.FaPaymentInstrumentConnectorService;
-import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
-import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
-import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
+import it.gov.pagopa.rtd.transaction_manager.service.*;
 import lombok.SneakyThrows;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,6 +29,8 @@ public class SaveTransactionCommandTest extends BaseTest {
     PaymentInstrumentConnectorService paymentInstrumentConnectorServiceMock;
     @Mock
     FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorServiceMock;
+    @Mock
+    FaMerchantConnectorService faMerchantConnectorServiceMock;
     @Mock
     PointTransactionPublisherService pointTransactionProducerServiceMock;
     @Mock
@@ -114,17 +114,28 @@ public class SaveTransactionCommandTest extends BaseTest {
         SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
         PaymentInstrumentResource resource = new PaymentInstrumentResource();
         resource.setStatus("ACTIVE");
+        resource.setActivationDate(OffsetDateTime.parse("2020-04-09T15:22:45.304Z"));
+        resource.setDeactivationDate(null);
+
+        MerchantResource merchantResource = new MerchantResource();
+        merchantResource.setTimestampTC(OffsetDateTime.parse("2020-04-09T15:22:45.304Z"));
 
         try {
 
             BDDMockito.doReturn(resource).when(faPaymentInstrumentConnectorServiceMock)
                     .find(Mockito.eq(transaction.getHpan()));
+            BDDMockito.doReturn(merchantResource).when(faMerchantConnectorServiceMock)
+                    .findMerchant(Mockito.eq(transaction.getMerchantId()));
 
             Boolean isOk = saveTransactionCommand.execute();
 
             Assert.assertTrue(isOk);
             BDDMockito.verify(faPaymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
                     .find(Mockito.eq(transaction.getHpan()));
+            BDDMockito.verify(faMerchantConnectorServiceMock, Mockito.atLeastOnce())
+                    .findMerchant(Mockito.eq(transaction.getMerchantId()));
+            BDDMockito.verify(invoiceTransactionProducerServiceMock, Mockito.atLeastOnce())
+                    .publishInvoiceTransactionEvent(Mockito.eq(transaction));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -231,7 +242,7 @@ public class SaveTransactionCommandTest extends BaseTest {
             BDDMockito.verifyZeroInteractions(paymentInstrumentConnectorServiceMock);
             BDDMockito.verifyZeroInteractions(pointTransactionProducerServiceMock);
             BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
-
+            BDDMockito.verifyZeroInteractions();
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -240,13 +251,13 @@ public class SaveTransactionCommandTest extends BaseTest {
     }
 
     protected SaveTransactionCommand buildCommandInstance(Transaction transaction) {
-        return
-                new SaveTransactionCommandImpl(
+        return new SaveTransactionCommandImpl(
                         SaveTransactionCommandModel.builder().payload(transaction).headers(null).build(),
                         paymentInstrumentConnectorServiceMock,
                         faPaymentInstrumentConnectorServiceMock,
                         pointTransactionProducerServiceMock,
-                        invoiceTransactionProducerServiceMock
+                        invoiceTransactionProducerServiceMock,
+                        faMerchantConnectorServiceMock
                 );
     }
 

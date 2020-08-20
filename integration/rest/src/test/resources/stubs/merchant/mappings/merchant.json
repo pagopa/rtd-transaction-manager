@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/fa/merchant/shop/(\\w*)"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {
+      "timestampTC": "2020-04-10T14:59:59.245Z"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": [
+      "response-template"
+    ]
+  }
+}

@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.OffsetDateTime;
 
 /**
- * Test class for the PaymentInstrumentConnectorService method
+ * Test class for the FaPaymentInstrumentConnectorService method
  */
 
 public class FaPaymentInstrumentConnectorServiceTest extends BaseTest {
