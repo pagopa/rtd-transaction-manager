@@ -94,14 +94,11 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             PaymentInstrumentResource paymentInstrumentResource =
                     faPaymentInstrumentConnectorService.find(transaction.getHpan());
             if (paymentInstrumentResource != null) {
-                MerchantResource merchantResource = faMerchantConnectorService.findMerchant(transaction.getMerchantId());
 
                 if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
                     (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
                     (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
-                           .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0) &&
-                    (merchantResource != null && merchantResource.getTimestampTC()
-                            .compareTo(transaction.getTrxDate()) <= 0)
+                           .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
                 ) {
                     if (log.isDebugEnabled()) {
                         log.debug("publishing valid transaction on FA: " +
