@@ -27,14 +27,12 @@ class SaveTransactionCommandImpl extends BaseSaveTransactionCommandImpl implemen
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
             FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
-            InvoiceTransactionPublisherService invoiceTransactionProducerService,
-            FaMerchantConnectorService faMerchantConnectorService) {
+            InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         super(saveTransactionCommandModel,
                 paymentInstrumentConnectorService,
                 faPaymentInstrumentConnectorService,
                 pointTransactionProducerService,
-                invoiceTransactionProducerService,
-                faMerchantConnectorService);
+                invoiceTransactionProducerService);
     }
 
     @Override

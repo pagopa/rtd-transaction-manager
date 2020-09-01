@@ -1,7 +1,6 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import it.gov.pagopa.bpd.common.BaseTest;
-import it.gov.pagopa.rtd.transaction_manager.connector.model.MerchantResource;
 import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
@@ -29,8 +28,6 @@ public class SaveTransactionCommandTest extends BaseTest {
     PaymentInstrumentConnectorService paymentInstrumentConnectorServiceMock;
     @Mock
     FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorServiceMock;
-    @Mock
-    FaMerchantConnectorService faMerchantConnectorServiceMock;
     @Mock
     PointTransactionPublisherService pointTransactionProducerServiceMock;
     @Mock
@@ -117,23 +114,17 @@ public class SaveTransactionCommandTest extends BaseTest {
         resource.setActivationDate(OffsetDateTime.parse("2020-04-09T15:22:45.304Z"));
         resource.setDeactivationDate(null);
 
-        MerchantResource merchantResource = new MerchantResource();
-        merchantResource.setTimestampTC(OffsetDateTime.parse("2020-04-09T15:22:45.304Z"));
 
         try {
 
             BDDMockito.doReturn(resource).when(faPaymentInstrumentConnectorServiceMock)
                     .find(Mockito.eq(transaction.getHpan()));
-            BDDMockito.doReturn(merchantResource).when(faMerchantConnectorServiceMock)
-                    .findMerchant(Mockito.eq(transaction.getMerchantId()));
 
             Boolean isOk = saveTransactionCommand.execute();
 
             Assert.assertTrue(isOk);
             BDDMockito.verify(faPaymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
                     .find(Mockito.eq(transaction.getHpan()));
-            BDDMockito.verify(faMerchantConnectorServiceMock, Mockito.atLeastOnce())
-                    .findMerchant(Mockito.eq(transaction.getMerchantId()));
             BDDMockito.verify(invoiceTransactionProducerServiceMock, Mockito.atLeastOnce())
                     .publishInvoiceTransactionEvent(Mockito.eq(transaction));
 
@@ -256,8 +247,7 @@ public class SaveTransactionCommandTest extends BaseTest {
                         paymentInstrumentConnectorServiceMock,
                         faPaymentInstrumentConnectorServiceMock,
                         pointTransactionProducerServiceMock,
-                        invoiceTransactionProducerServiceMock,
-                        faMerchantConnectorServiceMock
+                        invoiceTransactionProducerServiceMock
                 );
     }
 

@@ -1,7 +1,6 @@
 package it.gov.pagopa.rtd.transaction_manager.command;
 
 import eu.sia.meda.core.command.BaseCommand;
-import it.gov.pagopa.rtd.transaction_manager.connector.model.MerchantResource;
 import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
@@ -30,7 +29,6 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
     private SaveTransactionCommandModel saveTransactionCommandModel;
     private PaymentInstrumentConnectorService paymentInstrumentConnectorService;
     private FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService;
-    private FaMerchantConnectorService faMerchantConnectorService;
     private PointTransactionPublisherService pointTransactionProducerService;
     private InvoiceTransactionPublisherService invoiceTransactionProducerService;
 
@@ -43,14 +41,12 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
             FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
-            InvoiceTransactionPublisherService invoiceTransactionProducerService,
-            FaMerchantConnectorService faMerchantConnectorService) {
+            InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         this.saveTransactionCommandModel = saveTransactionCommandModel;
         this.paymentInstrumentConnectorService = paymentInstrumentConnectorService;
         this.faPaymentInstrumentConnectorService = faPaymentInstrumentConnectorService;
         this.pointTransactionProducerService = pointTransactionProducerService;
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
-        this.faMerchantConnectorService = faMerchantConnectorService;
     }
 
     /**
@@ -137,11 +133,6 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
     }
 
-    @Autowired
-    public void setFaMerchantConnectorService(
-            FaMerchantConnectorService faMerchantConnectorService) {
-        this.faMerchantConnectorService = faMerchantConnectorService;
-    }
 
     @Autowired
     public void setFaPaymentInstrumentConnectorService(
