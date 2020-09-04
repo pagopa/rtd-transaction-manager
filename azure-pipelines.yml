@@ -35,11 +35,11 @@ variables:
   isToDeploy: $[and(ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')))]
 
   ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release/st') }}:
-    devOpsEnv: 'pagopartdtransactionmanager.bpd-test'
+    devOpsEnv: 'pagopartdtransactionmanager.rtd-test'
     deployment: deployment-sit
     imageRepository: 'rtdtransactionmanager-sit'
   ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release/uat') }}:
-    devOpsEnv: 'pagopartdtransactionmanager.bpd-uat'
+    devOpsEnv: 'pagopartdtransactionmanager.rtd-uat'
     deployment: deployment-uat
     imageRepository: 'rtdtransactionmanager-uat'
 
