@@ -6,7 +6,8 @@
   "response": {
     "status": "200",
     "jsonBody": {
-      "status": "ACTIVE"
+      "status": "ACTIVE",
+      "activationDate": "2020-01-10T16:59:59.245+02:00"
     },
     "headers": {
       "Content-Type": "application/json"
