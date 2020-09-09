@@ -72,8 +72,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
 
     @ClassRule
     public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig()
-            .port(8080)
-            .bindAddress("localhost")
+            .dynamicPort()
             .usingFilesUnderClasspath("stubs/payment-instrument")
     );
 
