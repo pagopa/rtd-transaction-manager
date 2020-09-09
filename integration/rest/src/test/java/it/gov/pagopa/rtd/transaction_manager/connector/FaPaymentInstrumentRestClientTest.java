@@ -28,6 +28,7 @@ public class FaPaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
     @ClassRule
     public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig()
             .dynamicPort()
+            .bindAddress("127.0.0.1")
             .usingFilesUnderClasspath("stubs/payment-instrument")
             .extensions(new ResponseTemplateTransformer(false))
     );
