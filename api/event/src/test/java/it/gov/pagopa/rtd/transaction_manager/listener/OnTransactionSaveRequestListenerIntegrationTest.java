@@ -75,7 +75,7 @@ public class OnTransactionSaveRequestListenerIntegrationTest extends BaseEventLi
     public static WireMockClassRule wireMockRule;
 
     static {
-        String port = System.getenv("WIREMOCK_PORT");
+        String port = System.getenv("WiremockPort");
         wireMockRule = new WireMockClassRule(wireMockConfig()
                 .port(port != null ? Integer.parseInt(port) : 0)
                 .usingFilesUnderClasspath("stubs/payment-instrument"));
