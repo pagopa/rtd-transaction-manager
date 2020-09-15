@@ -31,7 +31,7 @@ public class OnTransactionSaveRequestListenerValidationErrorIntegrationTest exte
     protected Transaction getRequestObject() {
         return Transaction.builder()
                 .acquirerCode("001")
-                .trxDate(OffsetDateTime.parse("2020-04-10T14:59:59.245Z"))
+                .trxDate(OffsetDateTime.parse("2020-04-10T16:59:59.245+02:00"))
                 .amount(BigDecimal.valueOf(1313.13))
                 .operationType("00")
                 .hpan("test")
