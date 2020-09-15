@@ -54,10 +54,6 @@ public class OnTransactionSaveRequestListenerValidationErrorIntegrationTest exte
     @Override
     protected void verifyPublishedMessages(List<ConsumerRecord<String, String>> records) {
         Assert.assertEquals(1,records.size());
-        Transaction sentTransaction = getRequestObject();
-        sentTransaction.setTrxDate(OffsetDateTime.parse("2020-04-10T16:59:59.245+02:00"));
-        Transaction publishedTransaction = objectMapper.readValue(records.get(0).value(), Transaction.class);
-        Assert.assertEquals(sentTransaction, publishedTransaction);
     }
 
     @Override

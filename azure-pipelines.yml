@@ -60,6 +60,8 @@ stages:
               secureFile: 'settings.xml'
               retryCount: '2'
           - task: Maven@3
+            env:
+              WIREMOCK_PORT: $(System.AccessToken)
             inputs:
               mavenPomFile: 'pom.xml'
               goals: 'deploy'
