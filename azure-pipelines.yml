@@ -22,6 +22,9 @@ resources:
 
 variables:
 
+  # Wiremock Port
+  WiremockPort: '8080'
+
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '1b7900a3-6e8a-403a-b6ce-349854a5c6b8'
   containerRegistry: 'cstarregistry.azurecr.io'
@@ -60,8 +63,6 @@ stages:
               secureFile: 'settings.xml'
               retryCount: '2'
           - task: Maven@3
-            env:
-              WIREMOCK_PORT: $(System.AccessToken)
             inputs:
               mavenPomFile: 'pom.xml'
               goals: 'deploy'

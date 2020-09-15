@@ -29,12 +29,7 @@ public class FaPaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
     public static WireMockClassRule wireMockRule;
 
     static {
-        String port = null;
-        try {
-            port = System.getenv("WIREMOCK_PORT");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String port = System.getenv("WiremockPort");
         wireMockRule = new WireMockClassRule(wireMockConfig()
                 .port(port != null ? Integer.parseInt(port) : 0)
                 .bindAddress("localhost")
