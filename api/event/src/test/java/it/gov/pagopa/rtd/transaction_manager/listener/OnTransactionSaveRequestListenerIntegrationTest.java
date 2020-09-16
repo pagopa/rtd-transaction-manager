@@ -64,6 +64,7 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
                 "classpath:config/testTransactionManagerErrorPublisher.properties"
         },
         properties = {
+                "logging.level.it.gov.pagopa.rtd.transaction_manager=DEBUG",
                 "listeners.eventConfigurations.items.OnTransactionSaveRequestListener.bootstrapServers=${spring.embedded.kafka.brokers}",
                 "connectors.eventConfigurations.items.InvoiceTransactionPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
                 "connectors.eventConfigurations.items.PointTransactionPublisherConnector.bootstrapServers=${spring.embedded.kafka.brokers}",
