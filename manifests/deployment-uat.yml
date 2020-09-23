@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: rtdtransactionmanager
-          image: cstarregistry.azurecr.io/rtdtransactionmanager-uat
+          image: cstarregistry.azurecr.io/rtdtransactionmanager
           ports:
             - containerPort: 8080
           envFrom:
