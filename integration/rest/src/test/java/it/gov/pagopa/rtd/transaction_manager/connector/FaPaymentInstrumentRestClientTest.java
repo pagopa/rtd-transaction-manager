@@ -26,11 +26,18 @@ import static junit.framework.TestCase.assertNotNull;
 public class FaPaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
 
     @ClassRule
-    public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig()
-            .dynamicPort()
-            .usingFilesUnderClasspath("stubs/payment-instrument")
-            .extensions(new ResponseTemplateTransformer(false))
-    );
+    public static WireMockClassRule wireMockRule;
+
+    static {
+        String port = System.getenv("WIREMOCKPORT");
+        wireMockRule = new WireMockClassRule(wireMockConfig()
+                .port(port != null ? Integer.parseInt(port) : 0)
+                .bindAddress("localhost")
+                .usingFilesUnderClasspath("stubs/payment-instrument")
+                .extensions(new ResponseTemplateTransformer(false))
+        );
+    }
+
     @Autowired
     private FaPaymentInstrumentRestClient restClient;
 
@@ -49,6 +56,7 @@ public class FaPaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
         @SneakyThrows
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
+
             TestPropertySourceUtils
                     .addInlinedPropertiesToEnvironment(applicationContext,
                             String.format("rest-client.fa-payment-instrument.base-url=http://%s:%d/fa/payment-instruments",

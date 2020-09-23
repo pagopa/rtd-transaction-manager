@@ -1,5 +1,6 @@
 package it.gov.pagopa.rtd.transaction_manager.connector;
 
+import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
 import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import it.gov.pagopa.bpd.common.connector.BaseFeignRestClientTest;
 import it.gov.pagopa.rtd.transaction_manager.connector.config.BpdPaymentInstrumentRestConnectorConfig;
@@ -27,10 +28,17 @@ import static org.junit.Assert.assertTrue;
 public class PaymentInstrumentRestClientTest extends BaseFeignRestClientTest {
 
     @ClassRule
-    public static WireMockClassRule wireMockRule = new WireMockClassRule(wireMockConfig()
-            .dynamicPort()
-            .usingFilesUnderClasspath("stubs/payment-instrument")
-    );
+    public static WireMockClassRule wireMockRule;
+
+    static {
+        String port = System.getenv("WIREMOCKPORT");
+        wireMockRule = new WireMockClassRule(wireMockConfig()
+                .port(port != null ? Integer.parseInt(port) : 0)
+                .bindAddress("localhost")
+                .usingFilesUnderClasspath("stubs/payment-instrument")
+                .extensions(new ResponseTemplateTransformer(false))
+        );
+    }
 
     @Test
     public void checkActive() {

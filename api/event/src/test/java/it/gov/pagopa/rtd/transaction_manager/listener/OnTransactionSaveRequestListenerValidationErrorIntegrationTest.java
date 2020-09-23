@@ -31,7 +31,7 @@ public class OnTransactionSaveRequestListenerValidationErrorIntegrationTest exte
     protected Transaction getRequestObject() {
         return Transaction.builder()
                 .acquirerCode("001")
-                .trxDate(OffsetDateTime.parse("2020-04-10T14:59:59.245Z"))
+                .trxDate(OffsetDateTime.parse("2020-04-10T16:59:59.245+02:00"))
                 .amount(BigDecimal.valueOf(1313.13))
                 .operationType("00")
                 .hpan("test")
@@ -54,10 +54,6 @@ public class OnTransactionSaveRequestListenerValidationErrorIntegrationTest exte
     @Override
     protected void verifyPublishedMessages(List<ConsumerRecord<String, String>> records) {
         Assert.assertEquals(1,records.size());
-        Transaction sentTransaction = getRequestObject();
-        sentTransaction.setTrxDate(OffsetDateTime.parse("2020-04-10T16:59:59.245+02:00"));
-        Transaction publishedTransaction = objectMapper.readValue(records.get(0).value(), Transaction.class);
-        Assert.assertEquals(sentTransaction, publishedTransaction);
     }
 
     @Override

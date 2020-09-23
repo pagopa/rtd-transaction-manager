@@ -4,7 +4,7 @@
     "urlPath": "/bpd/payment-instruments/hashPan-active/history/active",
     "queryParameters": {
       "accountingDate": {
-        "equalTo": "2020-04-10T14:59:59.245Z"
+        "contains": "2020-04-10"
       }
     },
     "headers": {
