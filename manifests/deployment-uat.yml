@@ -1,9 +1,12 @@
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rtdtransactionmanager
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: rtdtransactionmanager
   template:
     metadata:
       labels:
@@ -11,7 +14,7 @@ spec:
     spec:
       containers:
         - name: rtdtransactionmanager
-          image: cstarregistry.azurecr.io/rtdtransactionmanager
+          image: cstaruatregistry.azurecr.io/rtdtransactionmanager
           ports:
             - containerPort: 8080
           envFrom:
@@ -27,5 +30,5 @@ spec:
                 name: rest-client
       hostAliases:
         - hostnames:
-            - bpd-hub-dev.servicebus.windows.net
-          ip: 10.70.5.10
+            - bpd-event-uat.servicebus.windows.net
+          ip: 10.70.67.5
