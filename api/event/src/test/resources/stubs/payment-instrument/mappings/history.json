@@ -4,7 +4,7 @@
     "urlPath": "/bpd/payment-instruments/test/history/active",
     "queryParameters": {
       "accountingDate": {
-        "equalTo": "2020-04-10T16:59:59.245+02:00"
+        "contains": "2020-04-10"
       }
     },
     "headers": {
