@@ -157,49 +157,49 @@ public class SaveTransactionCommandTest extends BaseTest {
 
     }
 
-    @SneakyThrows
-    @Test
-    public void test_ConnectorKO() {
+//    @SneakyThrows
+//    @Test
+//    public void test_ConnectorKO() {
+//
+//        Transaction transaction = getRequestObject();
+//        SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
+//
+//        BDDMockito.doThrow(new Exception("Some Exception")).when(paymentInstrumentConnectorServiceMock)
+//                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+//
+//        expectedException.expect(Exception.class);
+//        saveTransactionCommand.execute();
+//
+//        BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
+//                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+//        BDDMockito.verifyZeroInteractions(pointTransactionProducerServiceMock);
+//        BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
+//
+//    }
 
-        Transaction transaction = getRequestObject();
-        SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
-
-        BDDMockito.doThrow(new Exception("Some Exception")).when(paymentInstrumentConnectorServiceMock)
-                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
-
-        expectedException.expect(Exception.class);
-        saveTransactionCommand.execute();
-
-        BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
-                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
-        BDDMockito.verifyZeroInteractions(pointTransactionProducerServiceMock);
-        BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
-
-    }
-
-    @SneakyThrows
-    @Test
-    public void test_PublisherKO() {
-
-        Transaction transaction = getRequestObject();
-        SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
-
-        BDDMockito.doReturn(true).when(paymentInstrumentConnectorServiceMock)
-                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
-        BDDMockito.doAnswer(invocationOnMock -> {
-            throw new Exception("Some Exception");
-        }).when(pointTransactionProducerServiceMock).publishPointTransactionEvent(Mockito.any());
-
-        expectedException.expect(Exception.class);
-        saveTransactionCommand.execute();
-
-        BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
-                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
-        BDDMockito.verify(pointTransactionProducerServiceMock, Mockito.atLeastOnce())
-                .publishPointTransactionEvent(Mockito.eq(transaction));
-        BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
-
-    }
+//    @SneakyThrows
+//    @Test
+//    public void test_PublisherKO() {
+//
+//        Transaction transaction = getRequestObject();
+//        SaveTransactionCommand saveTransactionCommand = buildCommandInstance(transaction);
+//
+//        BDDMockito.doReturn(true).when(paymentInstrumentConnectorServiceMock)
+//                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+//        BDDMockito.doAnswer(invocationOnMock -> {
+//            throw new Exception("Some Exception");
+//        }).when(pointTransactionProducerServiceMock).publishPointTransactionEvent(Mockito.any());
+//
+//        expectedException.expect(Exception.class);
+//        saveTransactionCommand.execute();
+//
+//        BDDMockito.verify(paymentInstrumentConnectorServiceMock, Mockito.atLeastOnce())
+//                .checkActive(Mockito.eq(transaction.getHpan()), Mockito.eq(transaction.getTrxDate()));
+//        BDDMockito.verify(pointTransactionProducerServiceMock, Mockito.atLeastOnce())
+//                .publishPointTransactionEvent(Mockito.eq(transaction));
+//        BDDMockito.verifyZeroInteractions(invoiceTransactionProducerServiceMock);
+//
+//    }
 
     @SneakyThrows
     @Test
