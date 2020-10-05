@@ -28,6 +28,8 @@ spec:
                 name: eventhub-common
             - configMapRef:
                 name: rest-client
+            - configMapRef:
+                name: jvm
       hostAliases:
         - hostnames:
             - bpd-event-uat.servicebus.windows.net
