@@ -13,6 +13,11 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
 import javax.validation.*;
+import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -72,44 +77,51 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
         Transaction transaction = saveTransactionCommandModel.getPayload();
 
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm:ss.SSSXXXXX");
+
         try {
 
-            log.info("Executing SaveTransactionCommand for transaction: {}, {}, {}",
-                        transaction.getIdTrxAcquirer(),
-                        transaction.getAcquirerCode(),
-                        transaction.getTrxDate());
+            OffsetDateTime exec_start = OffsetDateTime.now();
 
             validateRequest(transaction);
 
             if (enableBPD) {
                 try {
 
-                    log.info("Calling checkActive for transaction: {}, {}, {}",
-                            transaction.getIdTrxAcquirer(),
-                            transaction.getAcquirerCode(),
-                            transaction.getTrxDate());
+                    OffsetDateTime check_start = OffsetDateTime.now();
 
                     Boolean checkActive = paymentInstrumentConnectorService
                             .checkActive(transaction.getHpan(), transaction.getTrxDate());
 
-                    log.info("Called checkActive for transaction: {}, {}, {}",
+                    OffsetDateTime check_end = OffsetDateTime.now();
+
+                    log.info("Executed checkActive for transaction: {}, {}, {} " +
+                                    "- Started at {}, Ended at {} - Total exec time: {}" ,
                             transaction.getIdTrxAcquirer(),
                             transaction.getAcquirerCode(),
-                            transaction.getTrxDate());
+                            transaction.getTrxDate(),
+                            dateTimeFormatter.format(check_start),
+                            dateTimeFormatter.format(check_end),
+                            ChronoUnit.MILLIS.between(check_start, check_end));
+
 
                     if (checkActive) {
 
-                        log.info("Publishing valid transaction on BPD: " +
-                                transaction.getIdTrxAcquirer() + ", " +
-                                transaction.getAcquirerCode() + ", " +
-                                transaction.getTrxDate());
+                        OffsetDateTime pub_start = OffsetDateTime.now();
 
                         pointTransactionProducerService.publishPointTransactionEvent(transaction);
 
-                        log.info("Published valid transaction on BPD: " +
-                                transaction.getIdTrxAcquirer() + ", " +
-                                transaction.getAcquirerCode() + ", " +
-                                transaction.getTrxDate());
+                        OffsetDateTime pub_end = OffsetDateTime.now();
+
+                        log.info("Executed publishing on BPD for transaction: {}, {}, {} " +
+                                        "- Started at {}, Ended at {} - Total exec time: {}" ,
+                                transaction.getIdTrxAcquirer(),
+                                transaction.getAcquirerCode(),
+                                transaction.getTrxDate(),
+                                dateTimeFormatter.format(pub_start),
+                                dateTimeFormatter.format(pub_end),
+                                ChronoUnit.MILLIS.between(pub_start, pub_end));
+
                     } else {
                         log.info("Met a transaction for an inactive payment instrument on BPD.");
                     }
@@ -143,6 +155,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                                         .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
                         ) {
 
+
                             log.info("Publishing valid transaction on BPD: " +
                                     transaction.getIdTrxAcquirer() + ", " +
                                     transaction.getAcquirerCode() + ", " +
@@ -166,10 +179,16 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                 }
             }
 
-            log.info("Executed SaveTransactionCommand for transaction: {}, {}, {}",
+            OffsetDateTime end_exec = OffsetDateTime.now();
+
+            log.info("Executed SaveTransactionCommand for transaction: {}, {}, {} " +
+                    "- Started at {}, Ended at {} - Total exec time: {}" ,
                     transaction.getIdTrxAcquirer(),
                     transaction.getAcquirerCode(),
-                    transaction.getTrxDate());
+                    transaction.getTrxDate(),
+                    dateTimeFormatter.format(exec_start),
+                    dateTimeFormatter.format(end_exec),
+                    ChronoUnit.MILLIS.between(exec_start, end_exec));
 
             return true;
 
