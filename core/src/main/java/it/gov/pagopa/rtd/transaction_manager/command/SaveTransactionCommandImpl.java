@@ -18,17 +18,19 @@ import org.springframework.stereotype.Component;
 @Slf4j
 class SaveTransactionCommandImpl extends BaseSaveTransactionCommandImpl implements SaveTransactionCommand {
 
-    public SaveTransactionCommandImpl(SaveTransactionCommandModel saveTransactionCommandModel) {
-        super(saveTransactionCommandModel);
+    public SaveTransactionCommandImpl(SaveTransactionCommandModel saveTransactionCommandModel, Boolean enableBPD, Boolean enableFA) {
+        super(saveTransactionCommandModel, enableBPD, enableFA);
     }
 
     public SaveTransactionCommandImpl(
             SaveTransactionCommandModel saveTransactionCommandModel,
+            Boolean enableBPD, Boolean enableFA,
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
             FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
             InvoiceTransactionPublisherService invoiceTransactionProducerService) {
         super(saveTransactionCommandModel,
+                enableBPD, enableFA,
                 paymentInstrumentConnectorService,
                 faPaymentInstrumentConnectorService,
                 pointTransactionProducerService,

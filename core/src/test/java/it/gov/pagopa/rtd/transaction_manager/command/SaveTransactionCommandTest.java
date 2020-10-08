@@ -200,6 +200,7 @@ public class SaveTransactionCommandTest extends BaseTest {
     protected SaveTransactionCommand buildCommandInstance(Transaction transaction) {
         return new SaveTransactionCommandImpl(
                         SaveTransactionCommandModel.builder().payload(transaction).headers(null).build(),
+                        true, true,
                         paymentInstrumentConnectorServiceMock,
                         faPaymentInstrumentConnectorServiceMock,
                         pointTransactionProducerServiceMock,

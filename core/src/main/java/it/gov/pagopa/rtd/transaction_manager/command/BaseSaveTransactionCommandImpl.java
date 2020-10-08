@@ -8,6 +8,7 @@ import it.gov.pagopa.rtd.transaction_manager.service.*;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
@@ -31,13 +32,20 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
     private FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService;
     private PointTransactionPublisherService pointTransactionProducerService;
     private InvoiceTransactionPublisherService invoiceTransactionProducerService;
+    private Boolean enableBPD;
+    private Boolean enableFA;
 
-    public BaseSaveTransactionCommandImpl(SaveTransactionCommandModel saveTransactionCommandModel) {
+
+    public BaseSaveTransactionCommandImpl(SaveTransactionCommandModel saveTransactionCommandModel,
+                                          Boolean enableBPD, Boolean enableFA) {
         this.saveTransactionCommandModel = saveTransactionCommandModel;
+        this.enableBPD = enableBPD;
+        this.enableFA = enableFA;
     }
 
     public BaseSaveTransactionCommandImpl(
             SaveTransactionCommandModel saveTransactionCommandModel,
+            Boolean enableBPD, Boolean enableFA,
             PaymentInstrumentConnectorService paymentInstrumentConnectorService,
             FaPaymentInstrumentConnectorService faPaymentInstrumentConnectorService,
             PointTransactionPublisherService pointTransactionProducerService,
@@ -47,6 +55,8 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
         this.faPaymentInstrumentConnectorService = faPaymentInstrumentConnectorService;
         this.pointTransactionProducerService = pointTransactionProducerService;
         this.invoiceTransactionProducerService = invoiceTransactionProducerService;
+        this.enableBPD = enableBPD;
+        this.enableFA = enableFA;
     }
 
     /**
@@ -71,85 +81,90 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
             validateRequest(transaction);
 
-            try {
+            if (enableBPD) {
+                try {
 
-                log.info("Calling checkActive for transaction: {}, {}, {}",
-                        transaction.getIdTrxAcquirer(),
-                        transaction.getAcquirerCode(),
-                        transaction.getTrxDate());
-
-                Boolean checkActive = paymentInstrumentConnectorService
-                        .checkActive(transaction.getHpan(), transaction.getTrxDate());
-
-                log.info("Called checkActive for transaction: {}, {}, {}",
-                        transaction.getIdTrxAcquirer(),
-                        transaction.getAcquirerCode(),
-                        transaction.getTrxDate());
-
-                if (checkActive) {
-
-                    log.info("Publishing valid transaction on BPD: " +
-                            transaction.getIdTrxAcquirer() + ", " +
-                            transaction.getAcquirerCode() + ", " +
+                    log.info("Calling checkActive for transaction: {}, {}, {}",
+                            transaction.getIdTrxAcquirer(),
+                            transaction.getAcquirerCode(),
                             transaction.getTrxDate());
 
-                    pointTransactionProducerService.publishPointTransactionEvent(transaction);
+                    Boolean checkActive = paymentInstrumentConnectorService
+                            .checkActive(transaction.getHpan(), transaction.getTrxDate());
 
-                    log.info("Published valid transaction on BPD: " +
-                            transaction.getIdTrxAcquirer() + ", " +
-                            transaction.getAcquirerCode() + ", " +
+                    log.info("Called checkActive for transaction: {}, {}, {}",
+                            transaction.getIdTrxAcquirer(),
+                            transaction.getAcquirerCode(),
                             transaction.getTrxDate());
-                } else {
-                    log.info("Met a transaction for an inactive payment instrument on BPD.");
-                }
 
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
-
-            try {
-
-                log.info("Calling find for transaction on FA " +
-                        transaction.getIdTrxAcquirer() + ", " +
-                        transaction.getAcquirerCode() + ", " +
-                        transaction.getTrxDate());
-
-                PaymentInstrumentResource paymentInstrumentResource =
-                        faPaymentInstrumentConnectorService.find(transaction.getHpan());
-
-                log.info("Called find for transaction on FA " +
-                        transaction.getIdTrxAcquirer() + ", " +
-                        transaction.getAcquirerCode() + ", " +
-                        transaction.getTrxDate());
-
-                if (paymentInstrumentResource != null) {
-
-                    if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
-                            (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
-                            (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
-                                    .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
-                    ) {
+                    if (checkActive) {
 
                         log.info("Publishing valid transaction on BPD: " +
                                 transaction.getIdTrxAcquirer() + ", " +
                                 transaction.getAcquirerCode() + ", " +
                                 transaction.getTrxDate());
 
-                        invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
+                        pointTransactionProducerService.publishPointTransactionEvent(transaction);
 
-                        log.info("Published valid transaction on FA: " +
+                        log.info("Published valid transaction on BPD: " +
                                 transaction.getIdTrxAcquirer() + ", " +
                                 transaction.getAcquirerCode() + ", " +
                                 transaction.getTrxDate());
-
                     } else {
-                        if (log.isInfoEnabled()) {
-                            log.info("Met a transaction for an inactive payment instrument on FA.");
-                        }
+                        log.info("Met a transaction for an inactive payment instrument on BPD.");
                     }
 
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
-            } catch (Exception e) {}
+            }
+
+            if (enableFA) {
+                try {
+
+                    log.info("Calling find for transaction on FA " +
+                            transaction.getIdTrxAcquirer() + ", " +
+                            transaction.getAcquirerCode() + ", " +
+                            transaction.getTrxDate());
+
+                    PaymentInstrumentResource paymentInstrumentResource =
+                            faPaymentInstrumentConnectorService.find(transaction.getHpan());
+
+                    log.info("Called find for transaction on FA " +
+                            transaction.getIdTrxAcquirer() + ", " +
+                            transaction.getAcquirerCode() + ", " +
+                            transaction.getTrxDate());
+
+                    if (paymentInstrumentResource != null) {
+
+                        if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
+                                (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
+                                (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
+                                        .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
+                        ) {
+
+                            log.info("Publishing valid transaction on BPD: " +
+                                    transaction.getIdTrxAcquirer() + ", " +
+                                    transaction.getAcquirerCode() + ", " +
+                                    transaction.getTrxDate());
+
+                            invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
+
+                            log.info("Published valid transaction on FA: " +
+                                    transaction.getIdTrxAcquirer() + ", " +
+                                    transaction.getAcquirerCode() + ", " +
+                                    transaction.getTrxDate());
+
+                        } else {
+                            if (log.isInfoEnabled()) {
+                                log.info("Met a transaction for an inactive payment instrument on FA.");
+                            }
+                        }
+
+                    }
+                } catch (Exception e) {
+                }
+            }
 
             log.info("Executed SaveTransactionCommand for transaction: {}, {}, {}",
                     transaction.getIdTrxAcquirer(),
