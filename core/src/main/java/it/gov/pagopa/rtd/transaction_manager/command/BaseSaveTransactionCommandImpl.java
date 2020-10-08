@@ -107,46 +107,49 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                 logger.error(e.getMessage(), e);
             }
 
-            log.info("Calling find for transaction on FA " +
-                    transaction.getIdTrxAcquirer() + ", " +
-                    transaction.getAcquirerCode() + ", " +
-                    transaction.getTrxDate());
+            try {
 
-            PaymentInstrumentResource paymentInstrumentResource =
-                    faPaymentInstrumentConnectorService.find(transaction.getHpan());
+                log.info("Calling find for transaction on FA " +
+                        transaction.getIdTrxAcquirer() + ", " +
+                        transaction.getAcquirerCode() + ", " +
+                        transaction.getTrxDate());
 
-            log.info("Called find for transaction on FA " +
-                    transaction.getIdTrxAcquirer() + ", " +
-                    transaction.getAcquirerCode() + ", " +
-                    transaction.getTrxDate());
+                PaymentInstrumentResource paymentInstrumentResource =
+                        faPaymentInstrumentConnectorService.find(transaction.getHpan());
 
-            if (paymentInstrumentResource != null) {
+                log.info("Called find for transaction on FA " +
+                        transaction.getIdTrxAcquirer() + ", " +
+                        transaction.getAcquirerCode() + ", " +
+                        transaction.getTrxDate());
 
-                if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
-                    (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
-                    (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
-                           .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
-                ) {
+                if (paymentInstrumentResource != null) {
 
-                    log.info("Publishing valid transaction on BPD: " +
-                            transaction.getIdTrxAcquirer() + ", " +
-                            transaction.getAcquirerCode() + ", " +
-                            transaction.getTrxDate());
+                    if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
+                            (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
+                            (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
+                                    .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
+                    ) {
 
-                    invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
+                        log.info("Publishing valid transaction on BPD: " +
+                                transaction.getIdTrxAcquirer() + ", " +
+                                transaction.getAcquirerCode() + ", " +
+                                transaction.getTrxDate());
 
-                    log.info("Published valid transaction on FA: " +
-                            transaction.getIdTrxAcquirer() + ", " +
-                            transaction.getAcquirerCode() + ", " +
-                            transaction.getTrxDate());
+                        invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
 
-                } else {
-                    if (log.isInfoEnabled()) {
-                        log.info("Met a transaction for an inactive payment instrument on FA.");
+                        log.info("Published valid transaction on FA: " +
+                                transaction.getIdTrxAcquirer() + ", " +
+                                transaction.getAcquirerCode() + ", " +
+                                transaction.getTrxDate());
+
+                    } else {
+                        if (log.isInfoEnabled()) {
+                            log.info("Met a transaction for an inactive payment instrument on FA.");
+                        }
                     }
-                }
 
-            }
+                }
+            } catch (Exception e) {}
 
             log.info("Executed SaveTransactionCommand for transaction: {}, {}, {}",
                     transaction.getIdTrxAcquirer(),
