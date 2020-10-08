@@ -1,6 +1,7 @@
 package it.gov.pagopa.rtd.transaction_manager.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.sia.meda.eventlistener.BaseConsumerAwareEventListener;
 import eu.sia.meda.eventlistener.BaseEventListener;
 import it.gov.pagopa.rtd.transaction_manager.command.SaveTransactionCommand;
 import it.gov.pagopa.rtd.transaction_manager.factory.ModelFactory;
@@ -23,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 @Slf4j
-public class OnTransactionSaveRequestListener extends BaseEventListener {
+public class OnTransactionSaveRequestListener extends BaseConsumerAwareEventListener {
 
     private final TransactionManagerErrorPublisherService transactionManagerErrorPublisherService;
     private final ModelFactory<Pair<byte[], Headers>, SaveTransactionCommandModel> saveTransactionCommandModelFactory;
