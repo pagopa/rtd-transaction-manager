@@ -88,21 +88,23 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             if (enableBPD) {
                 try {
 
-                    OffsetDateTime check_start = OffsetDateTime.now();
+                    Boolean checkActive = true;
 
-                    Boolean checkActive = paymentInstrumentConnectorService
-                            .checkActive(transaction.getHpan(), transaction.getTrxDate());
+//                    OffsetDateTime check_start = OffsetDateTime.now();
+//
+//                    Boolean checkActive = paymentInstrumentConnectorService
+//                            .checkActive(transaction.getHpan(), transaction.getTrxDate());
+//
+//                    OffsetDateTime check_end = OffsetDateTime.now();
 
-                    OffsetDateTime check_end = OffsetDateTime.now();
-
-                    log.info("Executed checkActive for transaction: {}, {}, {} " +
-                                    "- Started at {}, Ended at {} - Total exec time: {}" ,
-                            transaction.getIdTrxAcquirer(),
-                            transaction.getAcquirerCode(),
-                            transaction.getTrxDate(),
-                            dateTimeFormatter.format(check_start),
-                            dateTimeFormatter.format(check_end),
-                            ChronoUnit.MILLIS.between(check_start, check_end));
+//                    log.info("Executed checkActive for transaction: {}, {}, {} " +
+//                                    "- Started at {}, Ended at {} - Total exec time: {}" ,
+//                            transaction.getIdTrxAcquirer(),
+//                            transaction.getAcquirerCode(),
+//                            transaction.getTrxDate(),
+//                            dateTimeFormatter.format(check_start),
+//                            dateTimeFormatter.format(check_end),
+//                            ChronoUnit.MILLIS.between(check_start, check_end));
 
 
                     if (checkActive) {
