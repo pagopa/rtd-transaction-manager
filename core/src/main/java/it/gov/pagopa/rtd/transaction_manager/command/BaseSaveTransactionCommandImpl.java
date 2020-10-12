@@ -4,20 +4,20 @@ import eu.sia.meda.core.command.BaseCommand;
 import it.gov.pagopa.rtd.transaction_manager.connector.model.PaymentInstrumentResource;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
 import it.gov.pagopa.rtd.transaction_manager.model.Transaction;
-import it.gov.pagopa.rtd.transaction_manager.service.*;
+import it.gov.pagopa.rtd.transaction_manager.service.FaPaymentInstrumentConnectorService;
+import it.gov.pagopa.rtd.transaction_manager.service.InvoiceTransactionPublisherService;
+import it.gov.pagopa.rtd.transaction_manager.service.PaymentInstrumentConnectorService;
+import it.gov.pagopa.rtd.transaction_manager.service.PointTransactionPublisherService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Scope;
 
 import javax.validation.*;
-import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Set;
 
 /**
@@ -68,6 +68,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
      * Implementation of the MEDA Command doExecute method, contains the logic for the inbound transaction
      * management, calls the REST endpoint to check if it the related paymentInstrument is active, and eventually
      * sends the Transaction to the proper outbound channel. In case of an error, send a
+     *
      * @return boolean to indicate if the command is succesfully executed
      */
 
@@ -88,23 +89,21 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             if (enableBPD) {
                 try {
 
-                    Boolean checkActive = true;
+                    OffsetDateTime check_start = OffsetDateTime.now();
 
-//                    OffsetDateTime check_start = OffsetDateTime.now();
-//
-//                    Boolean checkActive = paymentInstrumentConnectorService
-//                            .checkActive(transaction.getHpan(), transaction.getTrxDate());
-//
-//                    OffsetDateTime check_end = OffsetDateTime.now();
+                    Boolean checkActive = paymentInstrumentConnectorService
+                            .checkActive(transaction.getHpan(), transaction.getTrxDate());
 
-//                    log.info("Executed checkActive for transaction: {}, {}, {} " +
-//                                    "- Started at {}, Ended at {} - Total exec time: {}" ,
-//                            transaction.getIdTrxAcquirer(),
-//                            transaction.getAcquirerCode(),
-//                            transaction.getTrxDate(),
-//                            dateTimeFormatter.format(check_start),
-//                            dateTimeFormatter.format(check_end),
-//                            ChronoUnit.MILLIS.between(check_start, check_end));
+                    OffsetDateTime check_end = OffsetDateTime.now();
+
+                    log.info("Executed checkActive for transaction: {}, {}, {} " +
+                                    "- Started at {}, Ended at {} - Total exec time: {}",
+                            transaction.getIdTrxAcquirer(),
+                            transaction.getAcquirerCode(),
+                            transaction.getTrxDate(),
+                            dateTimeFormatter.format(check_start),
+                            dateTimeFormatter.format(check_end),
+                            ChronoUnit.MILLIS.between(check_start, check_end));
 
 
                     if (checkActive) {
@@ -116,7 +115,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                         OffsetDateTime pub_end = OffsetDateTime.now();
 
                         log.info("Executed publishing on BPD for transaction: {}, {}, {} " +
-                                        "- Started at {}, Ended at {} - Total exec time: {}" ,
+                                        "- Started at {}, Ended at {} - Total exec time: {}",
                                 transaction.getIdTrxAcquirer(),
                                 transaction.getAcquirerCode(),
                                 transaction.getTrxDate(),
@@ -184,7 +183,7 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             OffsetDateTime end_exec = OffsetDateTime.now();
 
             log.info("Executed SaveTransactionCommand for transaction: {}, {}, {} " +
-                    "- Started at {}, Ended at {} - Total exec time: {}" ,
+                            "- Started at {}, Ended at {} - Total exec time: {}",
                     transaction.getIdTrxAcquirer(),
                     transaction.getAcquirerCode(),
                     transaction.getTrxDate(),
@@ -241,8 +240,8 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
 
     /**
      * Method to process a validation check for the parsed Transaction request
-     * @param request
-     *          instance of Transaction, parsed from the inbound byte[] payload
+     *
+     * @param request instance of Transaction, parsed from the inbound byte[] payload
      * @throws ConstraintViolationException
      */
     private void validateRequest(Transaction request) {
