@@ -2,7 +2,6 @@ package it.gov.pagopa.rtd.transaction_manager.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.sia.meda.eventlistener.BaseConsumerAwareEventListener;
-import eu.sia.meda.eventlistener.BaseEventListener;
 import it.gov.pagopa.rtd.transaction_manager.command.SaveTransactionCommand;
 import it.gov.pagopa.rtd.transaction_manager.factory.ModelFactory;
 import it.gov.pagopa.rtd.transaction_manager.model.SaveTransactionCommandModel;
@@ -13,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -31,10 +31,16 @@ public class OnTransactionSaveRequestListener extends BaseConsumerAwareEventList
     private final BeanFactory beanFactory;
     private final ObjectMapper objectMapper;
 
+    @Value("${it.gov.pagopa.rtd.transaction_manager.command.bpd.enabled}")
+    private Boolean enableBPD;
+
+    @Value("${it.gov.pagopa.rtd.transaction_manager.command.fa.enabled}")
+    private Boolean enableFA;
+
     @Autowired
     public OnTransactionSaveRequestListener(
             TransactionManagerErrorPublisherService transactionManagerErrorPublisherService,
-            ModelFactory<Pair<byte[], Headers>,SaveTransactionCommandModel> saveTransactionCommandModelFactory,
+            ModelFactory<Pair<byte[], Headers>, SaveTransactionCommandModel> saveTransactionCommandModelFactory,
             BeanFactory beanFactory,
             ObjectMapper objectMapper) {
         this.transactionManagerErrorPublisherService = transactionManagerErrorPublisherService;
@@ -69,7 +75,7 @@ public class OnTransactionSaveRequestListener extends BaseConsumerAwareEventList
             saveTransactionCommandModel = saveTransactionCommandModelFactory
                     .createModel(Pair.of(payload, headers));
             SaveTransactionCommand command = beanFactory.getBean(
-                    SaveTransactionCommand.class, saveTransactionCommandModel);
+                    SaveTransactionCommand.class, saveTransactionCommandModel, enableBPD, enableFA);
 
             if (!command.execute()) {
                 throw new Exception("Failed to execute SaveTransactionCommand");
