@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rtdtransactionmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rtdtransactionmanager
+  template:
+    metadata:
+      labels:
+        app: rtdtransactionmanager
+    spec:
+      containers:
+        - name: rtdtransactionmanager
+          image: cstarprodregistry.azurecr.io/rtdtransactionmanager
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: rtdtransactionmanager
+            - configMapRef:
+                name: rtdtransactionmanager
+            - configMapRef:
+                name: eventhub-logging
+            - configMapRef:
+                name: eventhub-common
+            - configMapRef:
+                name: rest-client
+            - configMapRef:
+                name: jvm
+      hostAliases:
+        - hostnames:
+            - u87cstarprod.servicebus.windows.net
+          ip: 10.70.132.4
