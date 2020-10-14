@@ -40,6 +40,7 @@ variables:
   isToDeploy: $[and(ne(variables['Build.Reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release')))]
   isSIT: $[eq(variables['Build.SourceBranch'], 'refs/heads/release/st')]
   isUAT: $[eq(variables['Build.SourceBranch'], 'refs/heads/release/uat')]
+  isPROD: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
 
   ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/release/st') }}:
     dockerRegistryServiceConnection: 'cstarregistry-connection'
