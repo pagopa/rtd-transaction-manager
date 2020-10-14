@@ -1,0 +1,19 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/fa/payment-instruments/(\\w*)"
+  },
+  "response": {
+    "status": "200",
+    "jsonBody": {
+      "status": "ACTIVE",
+      "activationDate": "2020-01-10T14:59:59.245Z"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": [
+      "response-template"
+    ]
+  }
+}
