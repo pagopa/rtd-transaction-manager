@@ -87,34 +87,33 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
             validateRequest(transaction);
 
             if (enableBPD) {
-                try {
 
-                    OffsetDateTime check_start = OffsetDateTime.now();
+                OffsetDateTime check_start = OffsetDateTime.now();
 
-                    Boolean checkActive = paymentInstrumentConnectorService
+                Boolean checkActive = paymentInstrumentConnectorService
                             .checkActive(transaction.getHpan(), transaction.getTrxDate());
 
-                    OffsetDateTime check_end = OffsetDateTime.now();
+                OffsetDateTime check_end = OffsetDateTime.now();
 
-                    log.info("Executed checkActive for transaction: {}, {}, {} " +
-                                    "- Started at {}, Ended at {} - Total exec time: {}",
-                            transaction.getIdTrxAcquirer(),
-                            transaction.getAcquirerCode(),
-                            transaction.getTrxDate(),
-                            dateTimeFormatter.format(check_start),
-                            dateTimeFormatter.format(check_end),
-                            ChronoUnit.MILLIS.between(check_start, check_end));
+                log.info("Executed checkActive for transaction: {}, {}, {} " +
+                                "- Started at {}, Ended at {} - Total exec time: {}",
+                        transaction.getIdTrxAcquirer(),
+                        transaction.getAcquirerCode(),
+                        transaction.getTrxDate(),
+                        dateTimeFormatter.format(check_start),
+                        dateTimeFormatter.format(check_end),
+                        ChronoUnit.MILLIS.between(check_start, check_end));
 
 
-                    if (checkActive) {
+                if (checkActive) {
 
-                        OffsetDateTime pub_start = OffsetDateTime.now();
+                    OffsetDateTime pub_start = OffsetDateTime.now();
 
-                        pointTransactionProducerService.publishPointTransactionEvent(transaction);
+                    pointTransactionProducerService.publishPointTransactionEvent(transaction);
 
-                        OffsetDateTime pub_end = OffsetDateTime.now();
+                    OffsetDateTime pub_end = OffsetDateTime.now();
 
-                        log.info("Executed publishing on BPD for transaction: {}, {}, {} " +
+                    log.info("Executed publishing on BPD for transaction: {}, {}, {} " +
                                         "- Started at {}, Ended at {} - Total exec time: {}",
                                 transaction.getIdTrxAcquirer(),
                                 transaction.getAcquirerCode(),
@@ -123,61 +122,55 @@ abstract class BaseSaveTransactionCommandImpl extends BaseCommand<Boolean> imple
                                 dateTimeFormatter.format(pub_end),
                                 ChronoUnit.MILLIS.between(pub_start, pub_end));
 
-                    } else {
-                        log.info("Met a transaction for an inactive payment instrument on BPD.");
-                    }
-
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                } else {
+                    log.info("Met a transaction for an inactive payment instrument on BPD.");
                 }
+
             }
 
             if (enableFA) {
-                try {
 
-                    log.info("Calling find for transaction on FA " +
-                            transaction.getIdTrxAcquirer() + ", " +
-                            transaction.getAcquirerCode() + ", " +
-                            transaction.getTrxDate());
+                log.info("Calling find for transaction on FA " +
+                        transaction.getIdTrxAcquirer() + ", " +
+                        transaction.getAcquirerCode() + ", " +
+                        transaction.getTrxDate());
 
-                    PaymentInstrumentResource paymentInstrumentResource =
-                            faPaymentInstrumentConnectorService.find(transaction.getHpan());
+                PaymentInstrumentResource paymentInstrumentResource =
+                        faPaymentInstrumentConnectorService.find(transaction.getHpan());
 
-                    log.info("Called find for transaction on FA " +
-                            transaction.getIdTrxAcquirer() + ", " +
-                            transaction.getAcquirerCode() + ", " +
-                            transaction.getTrxDate());
+                log.info("Called find for transaction on FA " +
+                        transaction.getIdTrxAcquirer() + ", " +
+                        transaction.getAcquirerCode() + ", " +
+                        transaction.getTrxDate());
 
-                    if (paymentInstrumentResource != null) {
+                if (paymentInstrumentResource != null) {
 
-                        if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
-                                (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
-                                (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
-                                        .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
-                        ) {
+                    if ("ACTIVE".equals(paymentInstrumentResource.getStatus()) &&
+                            (paymentInstrumentResource.getActivationDate().compareTo(transaction.getTrxDate()) <= 0) &&
+                            (paymentInstrumentResource.getDeactivationDate() == null || transaction.getTrxDate()
+                                    .compareTo(paymentInstrumentResource.getDeactivationDate()) < 0)
+                    ) {
 
+                        log.info("Publishing valid transaction on BPD: " +
+                                transaction.getIdTrxAcquirer() + ", " +
+                                transaction.getAcquirerCode() + ", " +
+                                transaction.getTrxDate());
 
-                            log.info("Publishing valid transaction on BPD: " +
-                                    transaction.getIdTrxAcquirer() + ", " +
-                                    transaction.getAcquirerCode() + ", " +
-                                    transaction.getTrxDate());
+                        invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
 
-                            invoiceTransactionProducerService.publishInvoiceTransactionEvent(transaction);
+                        log.info("Published valid transaction on FA: " +
+                                transaction.getIdTrxAcquirer() + ", " +
+                                transaction.getAcquirerCode() + ", " +
+                                transaction.getTrxDate());
 
-                            log.info("Published valid transaction on FA: " +
-                                    transaction.getIdTrxAcquirer() + ", " +
-                                    transaction.getAcquirerCode() + ", " +
-                                    transaction.getTrxDate());
-
-                        } else {
-                            if (log.isInfoEnabled()) {
-                                log.info("Met a transaction for an inactive payment instrument on FA.");
-                            }
+                    } else {
+                        if (log.isInfoEnabled()) {
+                            log.info("Met a transaction for an inactive payment instrument on FA.");
                         }
-
                     }
-                } catch (Exception e) {
+
                 }
+
             }
 
             OffsetDateTime end_exec = OffsetDateTime.now();
